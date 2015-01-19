@@ -1,7 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # SQL Server Management Studio Solution File, Format Version 12.00
-Project("{4F2E2C19-372F-40D8-9FA7-9D2138C6997A}") = "Создание базы данных", "Создание базы данных\Создание базы данных.ssmssqlproj", "{E264B404-B68F-4FCC-97AA-FBA32A41814C}"
+Project("{4F2E2C19-372F-40D8-9FA7-9D2138C6997A}") = "Таблицы и индексы", "Таблицы и индексы\Таблицы и индексы.ssmssqlproj", "{E264B404-B68F-4FCC-97AA-FBA32A41814C}"
+EndProject
+Project("{4F2E2C19-372F-40D8-9FA7-9D2138C6997A}") = "Процедуры. Обновление таблиц", "Процедуры. Обновление таблиц\Процедуры. Обновление таблиц.ssmssqlproj", "{F7533E2D-9355-4A2B-9FB8-E15F50594C47}"
+EndProject
+Project("{4F2E2C19-372F-40D8-9FA7-9D2138C6997A}") = "Представления", "Представления\Представления.ssmssqlproj", "{CC84A141-F743-4388-88D7-1AA1F3104364}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,6 +13,9 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{E264B404-B68F-4FCC-97AA-FBA32A41814C}.Default|Default.ActiveCfg = Default
+		{D1075EA7-3143-4A40-B488-3ABC0DB761D9}.Default|Default.ActiveCfg = Default
+		{F7533E2D-9355-4A2B-9FB8-E15F50594C47}.Default|Default.ActiveCfg = Default
+		{CC84A141-F743-4388-88D7-1AA1F3104364}.Default|Default.ActiveCfg = Default
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
