@@ -51,7 +51,7 @@ BEGIN
 			CAST(RegSales._Период AS date) AS TransactionDate	-- Дата операции
 			,Documents.ID AS DocumentID							-- ID документа
 			,SalesDocuments.ID AS SalesDocumentID				-- ID документа продажи
-			,TransactionsType.ID AS TransactionTypeID		-- ID типа операции
+			,TransactionsType.ID AS TransactionTypeID			-- ID типа операции
 			,Business.ID AS BusinessID							-- ID направления бизнеса
 			,Organizations.ID AS CompanyID						-- ID организации
 			,Branches.ID AS BranchID							-- ID филиала
