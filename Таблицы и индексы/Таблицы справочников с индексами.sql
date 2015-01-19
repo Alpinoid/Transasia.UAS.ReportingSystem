@@ -33,6 +33,60 @@ BEGIN
 
 END
 
+-- Список отчетов
+BEGIN
+
+	IF OBJECT_ID('[dbo].[t_Reports]','U') IS NOT NULL
+		DROP TABLE [dbo].[t_Reports]
+
+	CREATE TABLE [dbo].[t_Reports](
+		[ID] [int] NOT NULL,
+		[Report] [varchar](64) NOT NULL,
+	 CONSTRAINT [PK_Reports_ID] PRIMARY KEY CLUSTERED 
+	(
+		[ID] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+	) ON [PRIMARY]
+
+END
+
+-- Виды отчетов
+BEGIN
+
+	IF OBJECT_ID('[dbo].[t_ReportsTypes]','U') IS NOT NULL
+		DROP TABLE [dbo].[t_ReportsTypes]
+
+	CREATE TABLE [dbo].[t_ReportsTypes](
+		[ID] [int] NOT NULL,
+		[ReportID] [int] NOT NULL,
+		[ReportsTypes] [varchar](256) NOT NULL,
+	 CONSTRAINT [PK_ReportsTypes_ID] PRIMARY KEY CLUSTERED 
+	(
+		[ID] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+	) ON [PRIMARY]
+
+END
+
+-- Время актуальность данных отчета
+BEGIN
+
+	IF OBJECT_ID('[dbo].[t_RelevanceTimeOfReportData]','U') IS NOT NULL
+		DROP TABLE [dbo].[t_RelevanceTimeOfReportData]
+
+	CREATE TABLE [dbo].[t_RelevanceTimeOfReportData](
+		[ReportDate] [date] NOT NULL,
+		[ReportID] [int] NOT NULL,
+		[RelevanceTime] [datetime] NOT NULL,
+	 CONSTRAINT [PK_RelevanceTimeOfReportData_ID] PRIMARY KEY CLUSTERED 
+	(
+		[ReportDate] ASC
+		,[ReportID] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+	) ON [PRIMARY]
+
+END
+
 -- Типы задолженности
 BEGIN
 
