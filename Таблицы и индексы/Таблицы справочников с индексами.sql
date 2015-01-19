@@ -33,6 +33,42 @@ BEGIN
 
 END
 
+-- Типы задолженности
+BEGIN
+
+	IF OBJECT_ID('[dbo].[t_TypesOfDebt]','U') IS NOT NULL
+		DROP TABLE [dbo].[t_TypesOfDebt]
+
+	CREATE TABLE [dbo].[t_TypesOfDebt](
+		[ID] [int] NOT NULL,
+		[ТипДолга] [varchar](64) NOT NULL,
+	 CONSTRAINT [PK_t_TOD_ID] PRIMARY KEY CLUSTERED 
+	(
+		[ID] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+	) ON [PRIMARY]
+
+END
+
+-- Типы задержки
+BEGIN
+
+	IF OBJECT_ID('[dbo].[t_TypesOfDelay]','U') IS NOT NULL
+		DROP TABLE [dbo].[t_TypesOfDelay]
+
+	CREATE TABLE [dbo].[t_TypesOfDelay](
+		[ID] [int] NOT NULL,
+		[ВидПросрочки] [varchar](64) NOT NULL,
+		[MinDay] [int] NOT NULL,
+		[MaxDay] [int] NOT NULL,
+	 CONSTRAINT [PK_t_TODel_ID] PRIMARY KEY CLUSTERED 
+	(
+		[ID] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+	) ON [PRIMARY]
+
+END
+
 -- Справочник.НаправленияБизнеса
 BEGIN
 
