@@ -4,17 +4,51 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-SET ANSI_PADDING ON
-GO
-
 IF OBJECT_ID('[dbo].[t_Sales]','U') IS NOT NULL
-	DROP TABLE [dbo].[t_Sales]
+	BEGIN
+
+		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_TransactionsType]
+
+		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_TradeChanels]
+
+		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_Storehouses]
+
+		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_Staff]
+
+		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_SalesDocuments]
+
+		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_Routes]
+
+		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_PriceTypes]
+
+		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_Organizations]
+
+		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_Goods]
+
+		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_Documents]
+
+		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_DeliveryPoints]
+
+		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_Customers]
+
+		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_CreditLines]
+
+		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_Calendar]
+
+		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_Business]
+
+		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_Branches]
+
+		DROP TABLE [dbo].[t_Sales]
+
+	END
 GO
 
 CREATE TABLE [dbo].[t_Sales](
 	[ID] [bigint] IDENTITY(1,1) NOT NULL,
 	[TransactionDate] [date] NOT NULL,
 	[DocumentID] [int] NOT NULL,
+	[DocumentRow] [int] NOT NULL,
 	[SalesDocumentID] [int] NULL,
 	[TransactionTypeID] [int] NOT NULL,
 	[BusinessID] [int] NOT NULL,
@@ -47,6 +81,15 @@ CREATE TABLE [dbo].[t_Sales](
 	[ID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
+
+GO
+
+
+CREATE UNIQUE NONCLUSTERED INDEX [t_Sales_DocumentIDAndRow] ON [dbo].[t_Sales]
+(
+	[DocumentID] ASC,
+	[DocumentRow] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 
 GO
 
@@ -94,6 +137,8 @@ GO
 
 ALTER TABLE [dbo].[t_Sales]  WITH CHECK ADD  CONSTRAINT [FK_t_Sales_t_Documents] FOREIGN KEY([DocumentID])
 REFERENCES [dbo].[t_Documents] ([ID])
+ON UPDATE CASCADE
+ON DELETE CASCADE
 GO
 
 ALTER TABLE [dbo].[t_Sales] CHECK CONSTRAINT [FK_t_Sales_t_Documents]
@@ -129,6 +174,8 @@ GO
 
 ALTER TABLE [dbo].[t_Sales]  WITH CHECK ADD  CONSTRAINT [FK_t_Sales_t_SalesDocuments] FOREIGN KEY([SalesDocumentID])
 REFERENCES [dbo].[t_SalesDocuments] ([ID])
+ON UPDATE CASCADE
+ON DELETE CASCADE
 GO
 
 ALTER TABLE [dbo].[t_Sales] CHECK CONSTRAINT [FK_t_Sales_t_SalesDocuments]
@@ -160,7 +207,4 @@ REFERENCES [dbo].[t_TransactionsType] ([ID])
 GO
 
 ALTER TABLE [dbo].[t_Sales] CHECK CONSTRAINT [FK_t_Sales_t_TransactionsType]
-GO
-
-SET ANSI_PADDING OFF
 GO

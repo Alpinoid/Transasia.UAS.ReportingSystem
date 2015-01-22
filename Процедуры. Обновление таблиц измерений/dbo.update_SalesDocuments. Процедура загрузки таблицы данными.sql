@@ -21,10 +21,27 @@ BEGIN
 				,DocSales.Номер AS DocNumber													-- Номер документа
 				,SalesDocumentsType.ID AS DocumentTypeID										-- ID типа документа
 				,PaymentsType.ID AS PaymentMethodID												-- ID способа оплаты документа
-				,CAST(ISNULL(DocSales.ДатаФактическойДоставки, 0) AS date) AS DocDeliveryDate	-- Дата доставки																			-- Дата доставки
+				,CAST(ISNULL(DocSales.ДатаФактическойДоставки, 0) AS date) AS DocDeliveryDate	-- Дата доставки
 				,CAST(ISNULL(DocSales.ДатаОплаты, 0)  AS date) AS DocPaymentDay					-- Дата оплаты
 				,CONVERT(int, DocSales.БонусныйДокумент) AS IsBonusDoc							-- Признак бонусного документа
 			FROM [uas_central].dbo.Документ_РеализацияТоваров AS DocSales						-- Документ.РеализацияТоваров
+			LEFT JOIN dbo.t_SalesDocumentsType AS SalesDocumentsType ON SalesDocumentsType.UID_1C = DocSales.ТипДокумента
+			LEFT JOIN dbo.t_PaymentsType AS PaymentsType ON PaymentsType.UID_1C = DocSales.СпособОплаты
+			WHERE DocSales.Проведен = 0x01						-- Проведен
+			UNION ALL
+			SELECT
+				DocSales.Ссылка AS UID_1C																		-- ID документа
+				,ISNULL(DocSales.ВидДокумента, 'Ввод начальных остатков взаиморасчета')
+					+' №'+RTRIM(ISNULL(DocSales.НомерИсходногоДокумента, DocSales.Номер))+' от '
+					+ CONVERT(varchar(10), CAST(ISNULL(DocSales.ДатаИсходногоДокумента, DocSales.Дата) AS date), 104) AS Description	-- Описание документа
+				,CAST(ISNULL(DocSales.ДатаИсходногоДокумента, DocSales.Дата) AS date) AS DocDate				-- Дата документа
+				,ISNULL(DocSales.НомерИсходногоДокумента, DocSales.Номер) AS DocNumber							-- Номер документа
+				,SalesDocumentsType.ID AS DocumentTypeID														-- ID типа документа
+				,PaymentsType.ID AS PaymentMethodID																-- ID способа оплаты документа
+				,CAST(ISNULL(DocSales.ДатаИсходногоДокумента, DocSales.Дата) AS date) AS DocDeliveryDate		-- Дата доставки
+				,CAST(ISNULL(DocSales.ДатаОплаты, 0)  AS date) AS DocPaymentDay									-- Дата оплаты
+				,CONVERT(int, DocSales.БонусныйДокумент) AS IsBonusDoc											-- Признак бонусного документа
+			FROM [uas_central].dbo.Документ_ВводНачальныхОстатковВзаиморасчета AS DocSales		-- Документ.ВводНачальныхОстатковВзаиморасчета
 			LEFT JOIN dbo.t_SalesDocumentsType AS SalesDocumentsType ON SalesDocumentsType.UID_1C = DocSales.ТипДокумента
 			LEFT JOIN dbo.t_PaymentsType AS PaymentsType ON PaymentsType.UID_1C = DocSales.СпособОплаты
 			WHERE DocSales.Проведен = 0x01						-- Проведен
