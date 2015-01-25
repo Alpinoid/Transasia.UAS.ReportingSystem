@@ -24,6 +24,11 @@ BEGIN
 					WHEN SUM(1) OVER (PARTITION BY Parent.Наименование) <=1 THEN NULL
 					ELSE Element.Наименование
 				END AS ChildDescription
+				,Element.КодПорядка AS OrderBy
+				,CASE
+					WHEN SUM(1) OVER (PARTITION BY Parent.Наименование) <=1 THEN Element.КодПорядка
+					ELSE Parent.КодПорядка
+				END AS ParentOrderBy
 			FROM [uas_central].dbo.Справочник_Филиалы AS Element											-- Справочник.Филиалы
 			LEFT JOIN [uas_central].dbo.Справочник_Филиалы AS Parent ON Parent.Ссылка = Element.Родитель	-- Справочник.Филиалы (родитель)
 										OR (Parent.Ссылка = Element.Ссылка AND Element.Родитель = 0)
@@ -34,15 +39,21 @@ BEGIN
 			SET	Description = From_1C.Description
 				,ParentDescription = From_1C.ParentDescription
 				,ChildDescription = From_1C.ChildDescription
+				,OrderBy = From_1C.OrderBy
+				,ParentOrderBy = From_1C.ParentOrderBy
 		WHEN NOT MATCHED BY TARGET THEN
 			INSERT (	UID_1C
 						,Description
 						,ChildDescription
-						,ParentDescription)
+						,ParentDescription
+						,OrderBy
+						,ParentOrderBy)
 			VALUES (	From_1C.UID_1C
 						,From_1C.Description
 						,From_1C.ParentDescription
-						,From_1C.ChildDescription);
+						,From_1C.ChildDescription
+						,From_1C.OrderBy
+						,From_1C.ParentOrderBy);
 
 END
 GO

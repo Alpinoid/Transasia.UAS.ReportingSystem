@@ -158,6 +158,8 @@ BEGIN
 		[Description] [varchar](100) NOT NULL,
 		[ParentDescription] [varchar](100),
 		[ChildDescription] [varchar](100),
+		[OrderBy] [int],
+		[ParentOrderBy] [int],
 	 CONSTRAINT [PK_Branches_ID] PRIMARY KEY CLUSTERED 
 	(
 		[ID] ASC
@@ -738,6 +740,29 @@ BEGIN
 	) ON [PRIMARY]
 
 	CREATE NONCLUSTERED INDEX [t_Brands_UID] ON [dbo].[t_Brands]
+	(
+		[UID_1C] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
+
+END
+
+-- Справочник.ВидыИнициатив
+BEGIN
+
+	IF OBJECT_ID('[dbo].[t_InitiativesTypes]','U') IS NOT NULL
+		DROP TABLE [dbo].[t_InitiativesTypes]
+
+	CREATE TABLE [dbo].[t_InitiativesTypes](
+		[ID] [int] IDENTITY(1,1) NOT NULL,
+		[UID_1C] [binary](16) NOT NULL,
+		[Description] [varchar](25) NOT NULL
+	 CONSTRAINT [PK_InitiativesTypes_ID] PRIMARY KEY CLUSTERED 
+	(
+		[ID] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+	) ON [PRIMARY]
+
+	CREATE NONCLUSTERED INDEX [t_InitiativesTypes_UID] ON [dbo].[t_Brands]
 	(
 		[UID_1C] ASC
 	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
