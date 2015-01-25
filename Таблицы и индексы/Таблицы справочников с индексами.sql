@@ -132,7 +132,8 @@ BEGIN
 	CREATE TABLE [dbo].[t_Business](
 		[ID] [int] IDENTITY(1,1) NOT NULL,
 		[UID_1C] [binary](16) NOT NULL,
-		[Description] [varchar](50) NOT NULL
+		[Description] [varchar](50) NOT NULL,
+		[OrderBy] [int],
 	 CONSTRAINT [PK_Business_ID] PRIMARY KEY CLUSTERED 
 	(
 		[ID] ASC
