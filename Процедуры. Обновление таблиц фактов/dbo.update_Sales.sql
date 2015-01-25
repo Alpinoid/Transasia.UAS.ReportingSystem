@@ -42,6 +42,27 @@ BEGIN
 									ORDER BY TradeChanel._Период DESC) AS Реквизиты ON Реквизиты.ISISКанал = UID_1C
 				) AS TradeChanelID									-- ID канала торговли
 				,Goods.ID AS GoodID									-- ID номенклатуры
+				,(	SELECT
+						ID
+					FROM t_InitiativesTypes
+					INNER JOIN (	SELECT TOP 1
+										CSKUStates.ВидИнициативы AS InitiativesType
+									FROM [uas_central].dbo.РегистрСведений_СтатусыКодовДистрибьюции AS CSKUStates
+									INNER JOIN [uas_central].dbo.РегистрСведений_КодыCSKU AS Good ON Good.CSKU = CSKUStates.CSKU
+																								AND Good.Номенклатура = RegSales.Номенклатура
+									INNER JOIN (	SELECT TOP 1
+														TradeChanel.ISISКанал
+													FROM [uas_central].dbo.РегистрСведений_ПериодическиеРеквизитыТочекДоставки AS TradeChanel
+													WHERE TradeChanel.ТочкаДоставки = RegSales.ТочкаДоставки
+															AND TradeChanel._Период <= RegSales._Период
+													ORDER BY TradeChanel._Период DESC
+												) AS Реквизиты ON Реквизиты.ISISКанал = CSKUStates.КаналПродаж
+									WHERE CSKUStates._Период <= RegSales._Период
+										AND CSKUStates.Активна = 0x01
+									ORDER BY CSKUStates._Период DESC
+									) AS InitiativesTypes ON InitiativesTypes.InitiativesType = UID_1C
+
+				) AS InitiativesTypeID
 				,RegSales.Количество AS QuantityBase				-- Количество в базовых единицах измерения
 				,ROUND(RegSales.Количество * ISNULL ((
 														SELECT TOP 1
@@ -147,6 +168,7 @@ BEGIN
 				,TypePriceID = From_1C.TypePriceID
 				,TradeChanelID = From_1C.TradeChanelID
 				,GoodID = From_1C.GoodID
+				,InitiativesTypeID = From_1C.InitiativesTypeID
 				,QuantityBase = From_1C.QuantityBase
 				,QuantityUnit = From_1C.QuantityUnit
 				,QuantityBox = From_1C.QuantityBox
@@ -180,6 +202,7 @@ BEGIN
 						,TypePriceID
 						,TradeChanelID
 						,GoodID
+						,InitiativesTypeID
 						,QuantityBase
 						,QuantityUnit
 						,QuantityBox
@@ -210,6 +233,7 @@ BEGIN
 						,From_1C.TypePriceID
 						,From_1C.TradeChanelID
 						,From_1C.GoodID
+						,From_1C.InitiativesTypeID
 						,From_1C.QuantityBase
 						,From_1C.QuantityUnit
 						,From_1C.QuantityBox

@@ -25,6 +25,8 @@ IF OBJECT_ID('[dbo].[t_Sales]','U') IS NOT NULL
 
 		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_Goods]
 
+		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_InitiativesTypes]
+
 		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_Documents]
 
 		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_DeliveryPoints]
@@ -63,6 +65,7 @@ CREATE TABLE [dbo].[t_Sales](
 	[TypePriceID] [int] NULL,
 	[TradeChanelID] [int] NULL,
 	[GoodID] [int] NOT NULL,
+	[InitiativesTypeID] [int] NULL,
 	[QuantityBase] [numeric](15, 3) NOT NULL,
 	[QuantityUnit] [numeric](15, 3) NOT NULL,
 	[QuantityBox] [numeric](15, 3) NOT NULL,
@@ -200,6 +203,13 @@ REFERENCES [dbo].[t_TradeChanels] ([ID])
 GO
 
 ALTER TABLE [dbo].[t_Sales] CHECK CONSTRAINT [FK_t_Sales_t_TradeChanels]
+GO
+
+ALTER TABLE [dbo].[t_Sales]  WITH CHECK ADD  CONSTRAINT [FK_t_Sales_t_InitiativesTypes] FOREIGN KEY([InitiativesTypeID])
+REFERENCES [dbo].[t_InitiativesTypes] ([ID])
+GO
+
+ALTER TABLE [dbo].[t_Sales] CHECK CONSTRAINT [FK_t_Sales_t_InitiativesTypes]
 GO
 
 ALTER TABLE [dbo].[t_Sales]  WITH CHECK ADD  CONSTRAINT [FK_t_Sales_t_TransactionsType] FOREIGN KEY([TransactionTypeID])
