@@ -88,7 +88,6 @@ INNER JOIN [uas_central].dbo.Справочник_Контрагенты AS Контрагенты ON Контрагент
 LEFT JOIN [uas_central].dbo.Справочник_ТипыКонтрагента AS ТипыКонтрагента ON ТипыКонтрагента.Ссылка = Контрагенты.ТипКонтрагента
 INNER JOIN [ReportingDatabase].dbo.t_DocumentsTypes AS DocumentsTypes ON DocumentsTypes.UID_1C = ВзаиморасчетыИтоги.ДокументВзаиморасчета_ВидСсылки
 WHERE ВзаиморасчетыИтоги._Период = @DateOfSummation
-	AND ВзаиморасчетыИтоги._РазделительИтогов = 0
 UNION ALL
 SELECT
 	ВзаиморасчетыОбороты.НаправлениеБизнеса AS НаправлениеБизнеса
