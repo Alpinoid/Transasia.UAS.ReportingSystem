@@ -66,14 +66,14 @@ CREATE TABLE [dbo].[t_Sales](
 	[TradeChanelID] [int] NULL,
 	[GoodID] [int] NOT NULL,
 	[InitiativesTypeID] [int] NULL,
-	[QuantityBase] [numeric](15, 3) NOT NULL,
-	[QuantityUnit] [numeric](15, 3) NOT NULL,
-	[QuantityBox] [numeric](15, 3) NOT NULL,
-	[QuantityPack] [numeric](15, 3) NOT NULL,
-	[QuantityMSU] [numeric](15, 6) NOT NULL,
-	[Value] [numeric](10, 5) NOT NULL,
-	[WeightGross] [numeric](15, 5) NOT NULL,
-	[WeightNet] [numeric](15, 5) NOT NULL,
+	[QuantityBase] [numeric](30, 15) NOT NULL,
+	[QuantityUnit] [numeric](30, 15) NOT NULL,
+	[QuantityBox] [numeric](30, 15) NOT NULL,
+	[QuantityPack] [numeric](30, 15) NOT NULL,
+	[QuantityMSU] [numeric](30, 15) NOT NULL,
+	[Value] [numeric](30, 15) NOT NULL,
+	[WeightGross] [numeric](30, 15) NOT NULL,
+	[WeightNet] [numeric](30, 15) NOT NULL,
 	[AmountVAT] [numeric](15, 2) NOT NULL,
 	[AmountWithoutDiscount] [numeric](15, 2) NOT NULL,
 	[Amount] [numeric](15, 2) NOT NULL,
@@ -86,7 +86,6 @@ CREATE TABLE [dbo].[t_Sales](
 ) ON [PRIMARY]
 
 GO
-
 
 CREATE UNIQUE NONCLUSTERED INDEX [t_Sales_DocumentIDAndRow] ON [dbo].[t_Sales]
 (

@@ -64,50 +64,46 @@ BEGIN
 
 				) AS InitiativesTypeID
 				,RegSales.Количество AS QuantityBase				-- Количество в базовых единицах измерения
-				,ROUND(RegSales.Количество * ISNULL ((
-														SELECT TOP 1
-															CASE
-																WHEN ISNULL(MeasuresUnit.Коэффициент, 0) = 0 THEN 0
-																ELSE 1 / MeasuresUnit.Коэффициент
-															END
-														FROM [uas_central].dbo.Справочник_ЕдиницыИзмерения AS MeasuresUnit
-														INNER JOIN [uas_central].dbo.Справочник_КлассификаторЕдиницИзмерения AS Class ON MeasuresUnit.БазоваяЕдиница = Class.Ссылка
-																															AND Class.Код = '796'	-- [шт]
-														WHERE MeasuresUnit.Владелец = Goods.UID_1C), 0)
-		 											, 0, 1) AS QuantityUnit						-- Количество в [шт]
-				,ROUND(RegSales.Количество * ISNULL ((
-														SELECT TOP 1
-															CASE
-																WHEN ISNULL(MeasuresUnit.Коэффициент, 0) = 0 THEN 0
-																ELSE 1 / MeasuresUnit.Коэффициент
-															END
-														FROM [uas_central].dbo.Справочник_ЕдиницыИзмерения AS MeasuresUnit	-- Справочник.ЕдиницыИзмерения
-														INNER JOIN [uas_central].dbo.Справочник_КлассификаторЕдиницИзмерения AS Class ON MeasuresUnit.БазоваяЕдиница = Class.Ссылка
-																															AND Class.Код = '384'	-- [кор]
-														WHERE MeasuresUnit.Владелец = Goods.UID_1C), 0)
-													, 0, 1)  AS QuantityBox						-- Количество в [кор]
-				,ROUND(RegSales.Количество * ISNULL ((
-														SELECT TOP 1
-															CASE
-																WHEN ISNULL(MeasuresUnit.Коэффициент, 0) = 0 THEN 0
-																ELSE 1 / MeasuresUnit.Коэффициент
-															END
-														FROM [uas_central].dbo.Справочник_ЕдиницыИзмерения AS MeasuresUnit	-- Справочник.ЕдиницыИзмерения
-														INNER JOIN [uas_central].dbo.Справочник_КлассификаторЕдиницИзмерения AS Class ON MeasuresUnit.БазоваяЕдиница = Class.Ссылка
-																															AND Class.Код = '888'-- [уп]
-														WHERE MeasuresUnit.Владелец = Goods.UID_1C), 0)
-													, 0, 1)  AS QuantityPack					-- Количество в [уп]
-				,ROUND(RegSales.Количество * ISNULL ((
-														SELECT TOP 1
-															CASE
-																WHEN ISNULL(MeasuresUnit.Коэффициент, 0) = 0 THEN 0
-																ELSE 1 / MeasuresUnit.Коэффициент
-															END
-														FROM [uas_central].dbo.Справочник_ЕдиницыИзмерения AS MeasuresUnit	-- Справочник.ЕдиницыИзмерения
-														INNER JOIN [uas_central].dbo.Справочник_КлассификаторЕдиницИзмерения AS Class ON MeasuresUnit.БазоваяЕдиница = Class.Ссылка
-																															AND Class.Код = '384'	-- [кор]
-														WHERE MeasuresUnit.Владелец = Goods.UID_1C), 0)
-													, 0, 1) * Goods.MSU / 1000 AS QuantityMSU	-- Количество в [MSU]
+				,RegSales.Количество * ISNULL ((
+												SELECT TOP 1
+													CASE
+														WHEN ISNULL(MeasuresUnit.Коэффициент, 0) = 0 THEN 0
+														ELSE 1 / MeasuresUnit.Коэффициент
+													END
+												FROM [uas_central].dbo.Справочник_ЕдиницыИзмерения AS MeasuresUnit
+												INNER JOIN [uas_central].dbo.Справочник_КлассификаторЕдиницИзмерения AS Class ON MeasuresUnit.БазоваяЕдиница = Class.Ссылка
+																													AND Class.Код = '796'	-- [шт]
+												WHERE MeasuresUnit.Владелец = Goods.UID_1C), 0) AS QuantityUnit						-- Количество в [шт]
+				,RegSales.Количество * ISNULL ((
+												SELECT TOP 1
+													CASE
+														WHEN ISNULL(MeasuresUnit.Коэффициент, 0) = 0 THEN 0
+														ELSE 1 / MeasuresUnit.Коэффициент
+													END
+												FROM [uas_central].dbo.Справочник_ЕдиницыИзмерения AS MeasuresUnit	-- Справочник.ЕдиницыИзмерения
+												INNER JOIN [uas_central].dbo.Справочник_КлассификаторЕдиницИзмерения AS Class ON MeasuresUnit.БазоваяЕдиница = Class.Ссылка
+																													AND Class.Код = '384'	-- [кор]
+												WHERE MeasuresUnit.Владелец = Goods.UID_1C), 0) AS QuantityBox						-- Количество в [кор]
+				,RegSales.Количество * ISNULL ((
+												SELECT TOP 1
+													CASE
+														WHEN ISNULL(MeasuresUnit.Коэффициент, 0) = 0 THEN 0
+														ELSE 1 / MeasuresUnit.Коэффициент
+													END
+												FROM [uas_central].dbo.Справочник_ЕдиницыИзмерения AS MeasuresUnit	-- Справочник.ЕдиницыИзмерения
+												INNER JOIN [uas_central].dbo.Справочник_КлассификаторЕдиницИзмерения AS Class ON MeasuresUnit.БазоваяЕдиница = Class.Ссылка
+																													AND Class.Код = '888'-- [уп]
+												WHERE MeasuresUnit.Владелец = Goods.UID_1C), 0) AS QuantityPack						-- Количество в [уп]
+				,RegSales.Количество * ISNULL ((
+												SELECT TOP 1
+													CASE
+														WHEN ISNULL(MeasuresUnit.Коэффициент, 0) = 0 THEN 0
+														ELSE 1 / MeasuresUnit.Коэффициент
+													END
+												FROM [uas_central].dbo.Справочник_ЕдиницыИзмерения AS MeasuresUnit	-- Справочник.ЕдиницыИзмерения
+												INNER JOIN [uas_central].dbo.Справочник_КлассификаторЕдиницИзмерения AS Class ON MeasuresUnit.БазоваяЕдиница = Class.Ссылка
+																													AND Class.Код = '384'	-- [кор]
+												WHERE MeasuresUnit.Владелец = Goods.UID_1C), 0) * Goods.MSU / 1000 AS QuantityMSU	-- Количество в [MSU]
 				,ISNULL(MeasuresBase.Объем, 0) * RegSales.Количество AS Value					-- Объем
 				,ISNULL(MeasuresBase.ВесБрутто, 0) * RegSales.Количество AS WeightGross			-- Вес брутто
 				,ISNULL(MeasuresBase.ВесНетто, 0) * RegSales.Количество AS WeightNet			-- Вес брутто
@@ -248,6 +244,6 @@ BEGIN
 						,From_1C.AmountInCost
 						,From_1C.AmountInInputPrices);
 
-
 END
+
 GO
