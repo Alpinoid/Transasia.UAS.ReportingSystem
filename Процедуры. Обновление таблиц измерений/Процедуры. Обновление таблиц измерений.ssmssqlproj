@@ -68,9 +68,9 @@
           <FullPath>dbo.update_CSKUHierarchy. Процедура загрузки таблицы данными.sql</FullPath>
         </FileNode>
         <FileNode Name="dbo.update_Customers. Процедура загрузки таблицы данными.sql">
-          <AssociatedConnectionMoniker />
-          <AssociatedConnSrvName />
-          <AssociatedConnUserName />
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:V-SQL8:False:sa</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>V-SQL8</AssociatedConnSrvName>
+          <AssociatedConnUserName>sa</AssociatedConnUserName>
           <FullPath>dbo.update_Customers. Процедура загрузки таблицы данными.sql</FullPath>
         </FileNode>
         <FileNode Name="dbo.update_CustomersTypes. Процедура загрузки таблицы данными.sql">
@@ -80,9 +80,9 @@
           <FullPath>dbo.update_CustomersTypes. Процедура загрузки таблицы данными.sql</FullPath>
         </FileNode>
         <FileNode Name="dbo.update_DeliveryPoints. Процедура загрузки таблицы данными.sql">
-          <AssociatedConnectionMoniker />
-          <AssociatedConnSrvName />
-          <AssociatedConnUserName />
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:V-SQL8:False:sa</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>V-SQL8</AssociatedConnSrvName>
+          <AssociatedConnUserName>sa</AssociatedConnUserName>
           <FullPath>dbo.update_DeliveryPoints. Процедура загрузки таблицы данными.sql</FullPath>
         </FileNode>
         <FileNode Name="dbo.update_Documents. Процедура загрузки таблицы данными.sql">
@@ -110,9 +110,9 @@
           <FullPath>dbo.update_InitiativesTypes. Процедура загрузки таблицы данными.sql</FullPath>
         </FileNode>
         <FileNode Name="dbo.update_Organizations. Процедура загрузки таблицы данными.sql">
-          <AssociatedConnectionMoniker />
-          <AssociatedConnSrvName />
-          <AssociatedConnUserName />
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:V-SQL8:False:sa</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>V-SQL8</AssociatedConnSrvName>
+          <AssociatedConnUserName>sa</AssociatedConnUserName>
           <FullPath>dbo.update_Organizations. Процедура загрузки таблицы данными.sql</FullPath>
         </FileNode>
         <FileNode Name="dbo.update_PaymentsTypes. Процедура загрузки таблицы данными.sql">
@@ -204,6 +204,12 @@
           <AssociatedConnSrvName>V-SQL8</AssociatedConnSrvName>
           <AssociatedConnUserName>sa</AssociatedConnUserName>
           <FullPath>dbo.update_TypesOfDelay. Процедура загрузки таблицы предопределенными данными.sql</FullPath>
+        </FileNode>
+        <FileNode Name="dbo.update_Vendors. Процедура загрузки таблицы данными.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:V-SQL8:False:sa</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>V-SQL8</AssociatedConnSrvName>
+          <AssociatedConnUserName>sa</AssociatedConnUserName>
+          <FullPath>dbo.update_Vendors. Процедура загрузки таблицы данными.sql</FullPath>
         </FileNode>
       </Items>
     </LogicalFolder>

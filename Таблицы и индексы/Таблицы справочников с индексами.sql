@@ -197,7 +197,7 @@ BEGIN
 
 END
 
--- Справочник.Контрагенты
+-- Справочник.Контрагенты (Покупатели)
 BEGIN
 
 	IF OBJECT_ID('[dbo].[t_Customers]','U') IS NOT NULL
@@ -763,10 +763,92 @@ BEGIN
 	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 	) ON [PRIMARY]
 
-	CREATE NONCLUSTERED INDEX [t_InitiativesTypes_UID] ON [dbo].[t_Brands]
+	CREATE NONCLUSTERED INDEX [t_InitiativesTypes_UID] ON [dbo].[t_InitiativesTypes]
 	(
 		[UID_1C] ASC
 	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
+
+END
+
+-- Справочник.Контрагенты (Поставщики)
+BEGIN
+
+	IF OBJECT_ID('[dbo].[t_Vendors]','U') IS NOT NULL
+		DROP TABLE [dbo].[t_Vendors]
+
+	CREATE TABLE [dbo].[t_Vendors](
+		[ID] [int] IDENTITY(1,1) NOT NULL,
+		[UID_1C] [binary](16) NOT NULL,
+		[Code] [varchar](11) NOT NULL,
+		[INN] [varchar](12) NOT NULL,
+		[Description] [varchar](100) NOT NULL,
+		[CodeDescription] [varchar](128) NOT NULL,
+		[DescriptionCode] [varchar](128) NOT NULL,
+		[INNDescription] [varchar](128) NOT NULL,
+		[DescriptionINN] [varchar](128) NOT NULL,
+		[LegalAddress] [varchar](500),
+		[FactAddress] [varchar](500),
+	 CONSTRAINT [PK_Vendors_ID] PRIMARY KEY CLUSTERED 
+	(
+		[ID] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+	) ON [PRIMARY]
+
+	CREATE NONCLUSTERED INDEX [t_Vendors_UID] ON [dbo].[t_Vendors]
+	(
+		[UID_1C] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
+
+END
+
+-- Маркетинговые программы
+BEGIN
+
+	IF OBJECT_ID('[dbo].[t_MarketingPrograms]','U') IS NOT NULL
+		DROP TABLE [dbo].[t_MarketingPrograms]
+
+	CREATE TABLE [dbo].[t_MarketingPrograms](
+		[ID] [int] IDENTITY(1,1) NOT NULL,
+		[VendorID] [int] NOT NULL,
+		[Description] [varchar](25) NOT NULL
+	 CONSTRAINT [PK_MarketingPrograms_ID] PRIMARY KEY CLUSTERED 
+	(
+		[ID] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+	) ON [PRIMARY]
+
+	ALTER TABLE [dbo].[t_MarketingPrograms]  WITH CHECK ADD  CONSTRAINT [FK_t_MarketingPrograms_t_Vendors] FOREIGN KEY([VendorID])
+	REFERENCES [dbo].[t_Vendors] ([ID])
+
+	ALTER TABLE [dbo].[t_MarketingPrograms] CHECK CONSTRAINT [FK_t_MarketingPrograms_t_Vendors]
+
+END
+
+-- Продажи по маркетинговым программам
+BEGIN
+
+	IF OBJECT_ID('[dbo].[t_SalesMarketingPrograms]','U') IS NOT NULL
+		DROP TABLE [dbo].[t_SalesMarketingPrograms]
+
+	CREATE TABLE [dbo].[t_SalesMarketingPrograms](
+		[ID] [int] IDENTITY(1,1) NOT NULL,
+		[SalesID] [bigint] NOT NULL,
+		[MarketingProgramID] [int] NOT NULL
+	 CONSTRAINT [PK_SalesMarketingPrograms_ID] PRIMARY KEY CLUSTERED 
+	(
+		[ID] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+	) ON [PRIMARY]
+
+	ALTER TABLE [dbo].[t_SalesMarketingPrograms]  WITH CHECK ADD  CONSTRAINT [FK_t_SalesMarketingPrograms_t_MarketingPrograms] FOREIGN KEY([MarketingProgramID])
+	REFERENCES [dbo].[t_MarketingPrograms] ([ID])
+
+	ALTER TABLE [dbo].[t_SalesMarketingPrograms] CHECK CONSTRAINT [FK_t_SalesMarketingPrograms_t_MarketingPrograms]
+
+	ALTER TABLE [dbo].[t_SalesMarketingPrograms]  WITH CHECK ADD  CONSTRAINT [FK_t_SalesMarketingPrograms_t_Sales] FOREIGN KEY([SalesID])
+	REFERENCES [dbo].[t_Sales] ([ID])
+
+	ALTER TABLE [dbo].[t_SalesMarketingPrograms] CHECK CONSTRAINT [FK_t_SalesMarketingPrograms_t_Sales]
 
 END
 
