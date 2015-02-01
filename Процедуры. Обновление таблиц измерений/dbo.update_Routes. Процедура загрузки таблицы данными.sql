@@ -19,7 +19,7 @@ BEGIN
 				,Element.Наименование AS Description
 				,ISNULL(Branches.Description, 'Без филиала') AS Branch
 			FROM [uas_central].dbo.Справочник_Маршруты AS Element						-- Справочник.Маршруты
-			LEFT JOIN dbo.t_Teams AS Teams ON Teams.UID_1C = Element.Владелец			-- Справочник.КомандыТорговыхАгентов
+			INNER JOIN dbo.t_Teams AS Teams ON Teams.UID_1C = Element.Владелец			-- Справочник.КомандыТорговыхАгентов
 			LEFT JOIN dbo.t_Branches AS Branches ON Branches.UID_1C = Element.Филиал	-- Справочник.Филиалы
 			WHERE Element.ЭтоГруппа = 0x01
 			) AS From_1C

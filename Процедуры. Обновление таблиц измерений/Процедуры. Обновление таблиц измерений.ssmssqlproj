@@ -140,9 +140,9 @@
           <FullPath>dbo.update_ReportsTypes. Процедура загрузки таблицы предопределенными данными.sql</FullPath>
         </FileNode>
         <FileNode Name="dbo.update_Routes. Процедура загрузки таблицы данными.sql">
-          <AssociatedConnectionMoniker />
-          <AssociatedConnSrvName />
-          <AssociatedConnUserName />
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:V-SQL8:False:sa</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>V-SQL8</AssociatedConnSrvName>
+          <AssociatedConnUserName>sa</AssociatedConnUserName>
           <FullPath>dbo.update_Routes. Процедура загрузки таблицы данными.sql</FullPath>
         </FileNode>
         <FileNode Name="dbo.update_SalesDocuments. Процедура загрузки таблицы данными.sql">
