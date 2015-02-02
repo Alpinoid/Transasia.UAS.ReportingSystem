@@ -205,6 +205,12 @@
           <AssociatedConnUserName>sa</AssociatedConnUserName>
           <FullPath>dbo.update_TypesOfDelay. Процедура загрузки таблицы предопределенными данными.sql</FullPath>
         </FileNode>
+        <FileNode Name="dbo.update_TypesOfGoldStore. Процедура загрузки таблицы данными.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:V-SQL8:False:sa</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>V-SQL8</AssociatedConnSrvName>
+          <AssociatedConnUserName>sa</AssociatedConnUserName>
+          <FullPath>dbo.update_TypesOfGoldStore. Процедура загрузки таблицы данными.sql</FullPath>
+        </FileNode>
         <FileNode Name="dbo.update_Vendors. Процедура загрузки таблицы данными.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:V-SQL8:False:sa</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>V-SQL8</AssociatedConnSrvName>

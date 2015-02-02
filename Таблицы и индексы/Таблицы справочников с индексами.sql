@@ -215,7 +215,7 @@ BEGIN
 		[DescriptionINN] [varchar](128) NOT NULL,
 		[LegalAddress] [varchar](500),
 		[FactAddress] [varchar](500),
-		[CustomerTypeID] [int] NOT NULL
+		[CustomerTypeID] [int] NOT NULL,
 	 CONSTRAINT [PK_Customers_ID] PRIMARY KEY CLUSTERED 
 	(
 		[ID] ASC
@@ -226,6 +226,11 @@ BEGIN
 	(
 		[UID_1C] ASC
 	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
+
+	ALTER TABLE [dbo].[t_Customers]  WITH CHECK ADD  CONSTRAINT [FK_t_Customers_t_CustomersTypes] FOREIGN KEY([CustomerTypeID])
+	REFERENCES [dbo].[t_CustomersTypes] ([ID])
+
+	ALTER TABLE [dbo].[t_Customers] CHECK CONSTRAINT [FK_t_Customers_t_CustomersTypes]
 
 END
 
@@ -252,6 +257,23 @@ BEGIN
 
 END
 
+-- Типы Золотых магазинов
+BEGIN
+
+	IF OBJECT_ID('[dbo].[t_TypesOfGoldStore]','U') IS NOT NULL
+		DROP TABLE [dbo].[t_TypesOfGoldStore]
+
+	CREATE TABLE [dbo].[t_TypesOfGoldStore](
+		[ID] [smallint] IDENTITY(0,1) NOT NULL,
+		[Description] [varchar](128) NOT NULL,
+	 CONSTRAINT [PK_TypesOfGoldStore_ID] PRIMARY KEY CLUSTERED 
+	(
+		[ID] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+	) ON [PRIMARY]
+
+END
+
 -- Справочник.ТочкиДоставки
 BEGIN
 
@@ -266,6 +288,7 @@ BEGIN
 		[CodeDescription] [varchar](128) NOT NULL,
 		[DescriptionCode] [varchar](128) NOT NULL,
 		[Branch] [varchar](50),
+		[GoldStoreType] [smallint] NOT NULL,
 	 CONSTRAINT [PK_DeliveryPoints_ID] PRIMARY KEY CLUSTERED 
 	(
 		[ID] ASC

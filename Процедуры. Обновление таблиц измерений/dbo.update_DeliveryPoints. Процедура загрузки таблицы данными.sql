@@ -14,12 +14,13 @@ BEGIN
 	MERGE INTO [dbo].[t_DeliveryPoints] AS ReportingTable
 	USING (	
 			SELECT
-				Element.Ссылка AS UID_1C												-- ID точки доставки
-				,Element.Код AS Code													-- Код
-				,Element.Наименование AS Description									-- Наименование
-				,Element.Код + ': ' + Element.Наименование AS CodeDescription			-- Код: Наименование
-				,Element.Наименование + ' (' + Element.Код + ')' AS DescriptionCode		-- Наименовнаие (Код)
-				,ISNULL(Branch.Description, 'Без филиала') AS Branch							-- Филиал
+				Element.Ссылка AS UID_1C																		-- ID точки доставки
+				,Element.Код AS Code																			-- Код
+				,Element.Наименование AS Description															-- Наименование
+				,Element.Код + ': ' + Element.Наименование AS CodeDescription									-- Код: Наименование
+				,Element.Наименование + ' (' + Element.Код + ')' AS DescriptionCode								-- Наименовнаие (Код)
+				,ISNULL(Branch.Description, 'Без филиала') AS Branch											-- Филиал
+				,ISNULL([uas_central].dbo.get_tt_gold_status(Element.Ссылка, GETDATE()), 0) AS GoldStoreType	-- Статус Золотого магазина
 			FROM [uas_central].dbo.Справочник_ТочкиДоставки AS Element												-- Справочник.ТочкиДоставки
 			INNER JOIN [uas_central].dbo.Справочник_Контрагенты AS Customers ON Customers.Ссылка = Element.Владелец	-- Справочник.Контрагенты
 														AND Customers.Покупатель = 1								-- Покупатель
@@ -33,19 +34,22 @@ BEGIN
 				,CodeDescription = From_1C.CodeDescription
 				,DescriptionCode = From_1C.DescriptionCode
 				,Branch = From_1C.Branch
+				,GoldStoreType = From_1C.GoldStoreType
 		WHEN NOT MATCHED BY TARGET THEN
 			INSERT (	UID_1C
 						,Code
 						,Description
 						,CodeDescription
 						,DescriptionCode
-						,Branch)
+						,Branch
+						,GoldStoreType)
 			VALUES (	From_1C.UID_1C
 						,From_1C.Code
 						,From_1C.Description
 						,From_1C.CodeDescription
 						,From_1C.DescriptionCode
-						,From_1C.Branch);
+						,From_1C.Branch
+						,From_1C.GoldStoreType);
 
 END
 GO
