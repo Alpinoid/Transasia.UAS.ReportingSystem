@@ -25,9 +25,17 @@ SELECT
 	,Business.Наименование AS НаправлениеБизнеса									-- Направление бизнеса
 	,Branch.Наименование AS Филиал													-- Наименовнаие филиала
 	,ISNULL(CreditLine.Наименование, 'Нет') AS КредитноеНаправление					-- Кредитное направления
-	,ISNULL(Route.Наименование, 'Нет') AS Маршрут									-- Марушрта (торговый представитель)
+	,ISNULL(Route.Наименование, 'Нет') AS Маршрут									-- Маршрут (торговый представитель)
+	,CASE
+		WHEN Business.Наименование = 'Food' THEN	CASE
+														WHEN Team.ЭксклюзивнаяКоманда = 0x01 THEN ISNULL(RouteForFood.Наименование, 'Нет')
+														ELSE ISNULL(Route.Наименование, 'Нет')
+													END
+		ELSE ''
+	END AS МаршрутFood																-- Маршрута для FOOD (торговый представитель)
 	,ISNULL(Docs.ВидДокумента, 'Аванс') AS ВидДокумента								-- Вид документа
 	,ISNULL(SalesDocumentsType.Description, 'Не определен') AS ТипДокументаПродажи	-- Тип документа продажи
+	,ISNULL(PaymentsType.Description, 'Не определен') AS ТипОплатыДокумента			-- Тип оплаты документа продажи
 	,ISNULL(Docs.НомерДокумента, 'Аванс') AS НомерДокумента							-- Номер документа
 	,Docs.ДатаДокумента AS ДатаДокумента											-- Дата документа
 	,Docs.ДатаОплаты AS ДатаОплаты													-- Дата оплаты
@@ -59,6 +67,7 @@ LEFT JOIN (	SELECT
 				,Маршрут AS Маршрут
 				,ТочкаДоставки AS ТочкаДоставки
 				,СуммаДокумента AS СуммаДокумента
+				,СпособОплаты AS СпособОплаты
 			FROM [uas_central].dbo.Документ_РеализацияТоваров
 			UNION ALL
 			SELECT	
@@ -71,6 +80,7 @@ LEFT JOIN (	SELECT
 				,Маршрут AS Маршрут
 				,ТочкаДоставки AS ТочкаДоставки
 				,СуммаДокумента AS СуммаДокумента
+				,СпособОплаты AS СпособОплаты
 			FROM [uas_central].dbo.Документ_ВозвратТоваровОтПокупателя
 			UNION ALL
 			SELECT			
@@ -83,11 +93,25 @@ LEFT JOIN (	SELECT
 				,NULL AS Маршрут
 				,ТочкаДоставки AS ТочкаДоставки
 				,СуммаИсходногоДокумента AS СуммаДокумента
+				,СпособОплаты AS СпособОплаты
 			FROM [uas_central].dbo.Документ_ВводНачальныхОстатковВзаиморасчета
 		) AS Docs ON Docs.Ссылка = Receivables.ДокументВзаиморасчета
 LEFT JOIN [uas_central].dbo.Справочник_КредитныеНаправления AS CreditLine ON CreditLine.Ссылка = Docs.КредитноеНаправление
 LEFT JOIN [uas_central].dbo.Справочник_Маршруты AS Route ON Route.Ссылка = Docs.Маршрут
+LEFT JOIN [uas_central].dbo.Справочник_КомандыТорговыхАгентов AS Team ON Team.Ссылка = Route.Владелец
 LEFT JOIN [uas_central].dbo.Справочник_ТочкиДоставки AS TradeShop ON TradeShop.Ссылка = Docs.ТочкаДоставки
+LEFT JOIN (
+			SELECT
+				MAX(Route.Наименование) AS Наименование
+				,Маршруты.ТочкаДоставки AS ТочкаДоставки
+			FROM [uas_central].dbo.Справочник_Маршруты_ТочкиДоставкиКонтрагентов AS Маршруты
+			LEFT JOIN [uas_central].dbo.Справочник_Маршруты AS Route ON Route.Ссылка = Маршруты.Владелец
+			INNER JOIN [uas_central].dbo.Справочник_КомандыТорговыхАгентов AS Team ON Team.Ссылка = Route.Владелец
+																					AND Team.НаправлениеБизнеса = 0x829508606E88610311E4843B1F21A0A6
+																					AND Team.ЭксклюзивнаяКоманда = 0x00
+			GROUP BY Маршруты.ТочкаДоставки
+		) AS RouteForFood ON RouteForFood.ТочкаДоставки =  Docs.ТочкаДоставки
 LEFT JOIN [uas_central].dbo.РегистрСведений_СоответствиеОбъектовИнформационныхБаз AS OldBase ON OldBase.Объект_Ссылка = TradeShop.Ссылка
+LEFT JOIN dbo.t_PaymentsType AS PaymentsType ON PaymentsType.UID_1C = Docs.СпособОплаты
 
 GO
