@@ -3,6 +3,18 @@
   <Items>
     <LogicalFolder Name="Соединения" Type="2" Sorted="true">
       <Items>
+        <ConnectionNode Name="V-SQL4:sa">
+          <Created>2015-02-04T10:50:57.8956095+03:00</Created>
+          <Type>SQL</Type>
+          <Server>V-SQL4</Server>
+          <UserName>sa</UserName>
+          <Authentication>SQL</Authentication>
+          <InitialDB />
+          <LoginTimeout>15</LoginTimeout>
+          <ExecutionTimeout>0</ExecutionTimeout>
+          <ConnectionProtocol>NotSpecified</ConnectionProtocol>
+          <ApplicationName>Среда Microsoft SQL Server Management Studio - запрос</ApplicationName>
+        </ConnectionNode>
         <ConnectionNode Name="V-SQL8:sa">
           <Created>2015-01-19T12:36:22.1020756+03:00</Created>
           <Type>SQL</Type>
@@ -128,8 +140,8 @@
           <FullPath>dbo.update_PriceTypes. Процедура загрузки таблицы данными.sql</FullPath>
         </FileNode>
         <FileNode Name="dbo.update_Reports. Процедура загрузки таблицы предопределенными данными.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:V-SQL8:False:sa</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>V-SQL8</AssociatedConnSrvName>
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:V-SQL4:False:sa</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>V-SQL4</AssociatedConnSrvName>
           <AssociatedConnUserName>sa</AssociatedConnUserName>
           <FullPath>dbo.update_Reports. Процедура загрузки таблицы предопределенными данными.sql</FullPath>
         </FileNode>

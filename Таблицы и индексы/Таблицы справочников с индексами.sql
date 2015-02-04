@@ -306,12 +306,17 @@ END
 BEGIN
 
 	IF OBJECT_ID('[dbo].[t_Routes]','U') IS NOT NULL
-		DROP TABLE [dbo].[t_Routes]
+		BEGIN
+			ALTER TABLE [dbo].[t_Routes] DROP CONSTRAINT [FK_t_Routes_t_Teams]
+			ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_Routes]
+			DROP TABLE [dbo].[t_Routes]
+		END
 
 	CREATE TABLE [dbo].[t_Routes](
 		[ID] [int] IDENTITY(1,1) NOT NULL,
 		[UID_1C] [binary](16) NOT NULL,
 		[TeamID] [int] NOT NULL,
+		[ManagerID] [int] NULL,
 		[Description] [varchar](100) NOT NULL,
 		[Branch] [varchar](50) NOT NULL,
 	 CONSTRAINT [PK_Routes_ID] PRIMARY KEY CLUSTERED 
@@ -324,6 +329,16 @@ BEGIN
 	(
 		[UID_1C] ASC
 	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
+
+	ALTER TABLE [dbo].[t_Routes]  WITH CHECK ADD  CONSTRAINT [FK_t_Routes_t_Teams] FOREIGN KEY([TeamID])
+	REFERENCES [dbo].[t_Teams] ([ID])
+	
+	ALTER TABLE [dbo].[t_Routes] CHECK CONSTRAINT [FK_t_Routes_t_Teams]
+
+	ALTER TABLE [dbo].[t_Sales]  WITH CHECK ADD  CONSTRAINT [FK_t_Sales_t_Routes] FOREIGN KEY([RouteID])
+	REFERENCES [dbo].[t_Routes] ([ID])
+
+	ALTER TABLE [dbo].[t_Sales] CHECK CONSTRAINT [FK_t_Sales_t_Routes]
 
 END
 
