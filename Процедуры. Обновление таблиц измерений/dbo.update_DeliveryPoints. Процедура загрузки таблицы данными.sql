@@ -21,10 +21,18 @@ BEGIN
 				,Element.Наименование + ' (' + Element.Код + ')' AS DescriptionCode								-- Наименовнаие (Код)
 				,ISNULL(Branch.Description, 'Без филиала') AS Branch											-- Филиал
 				,ISNULL([uas_central].dbo.get_tt_gold_status(Element.Ссылка, GETDATE()), 0) AS GoldStoreType	-- Статус Золотого магазина
+				,FactAddress.Представление AS FactAddress														-- Фактический адрес
 			FROM [uas_central].dbo.Справочник_ТочкиДоставки AS Element												-- Справочник.ТочкиДоставки
 			INNER JOIN [uas_central].dbo.Справочник_Контрагенты AS Customers ON Customers.Ссылка = Element.Владелец	-- Справочник.Контрагенты
 														AND Customers.Покупатель = 1								-- Покупатель
 			LEFT JOIN dbo.t_Branches AS Branch ON Branch.UID_1C = Element.Филиал									-- Справочник.Филиалы
+			LEFT JOIN (	SELECT
+							ElementFactAddress.Владелец AS Владелец
+							,ElementFactAddress.Представление AS Представление
+						FROM [uas_central].dbo.Справочник_ТочкиДоставки_КонтактнаяИнформация AS ElementFactAddress																-- Справочник.Справочник_ТочкиДоставки_КонтактнаяИнформация
+						INNER JOIN [uas_central].dbo.Справочник_ВидыКонтактнойИнформации AS ElementTypeFactAddress ON ElementTypeFactAddress.Ссылка = ElementFactAddress.Вид	-- Справочник.ВидыКонтактнойИнформации
+																				AND ElementTypeFactAddress.ИмяПредопределенныхДанных = 0xA8E1D29ACE15A60446FA7B1246B7EF5A		-- Фактически адрес
+					) AS FactAddress ON FactAddress.Владелец = Element.Ссылка
 			) AS From_1C
 	ON ReportingTable.UID_1C = From_1C.UID_1C
 		WHEN MATCHED THEN
@@ -35,6 +43,7 @@ BEGIN
 				,DescriptionCode = From_1C.DescriptionCode
 				,Branch = From_1C.Branch
 				,GoldStoreType = From_1C.GoldStoreType
+				,FactAddress = From_1C.FactAddress
 		WHEN NOT MATCHED BY TARGET THEN
 			INSERT (	UID_1C
 						,Code
@@ -42,14 +51,16 @@ BEGIN
 						,CodeDescription
 						,DescriptionCode
 						,Branch
-						,GoldStoreType)
+						,GoldStoreType
+						,FactAddress)
 			VALUES (	From_1C.UID_1C
 						,From_1C.Code
 						,From_1C.Description
 						,From_1C.CodeDescription
 						,From_1C.DescriptionCode
 						,From_1C.Branch
-						,From_1C.GoldStoreType);
+						,From_1C.GoldStoreType
+						,From_1C.FactAddress);
 
 END
 GO

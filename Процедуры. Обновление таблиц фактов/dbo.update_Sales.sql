@@ -16,21 +16,24 @@ BEGIN
 	MERGE INTO dbo.t_Sales AS ReportingTable
 	USING (	
 			SELECT
-				CAST(RegSales._Период AS date) AS TransactionDate	-- Дата операции
-				,Documents.ID AS DocumentID							-- ID документа
-				,RegSales.НомерСтроки AS DocumentRow				-- Номер строки документа
-				,SalesDocuments.ID AS SalesDocumentID				-- ID документа продажи
-				,TransactionsType.ID AS TransactionTypeID			-- ID типа операции
-				,Business.ID AS BusinessID							-- ID направления бизнеса
-				,Organizations.ID AS CompanyID						-- ID организации
-				,Branches.ID AS BranchID							-- ID филиала
-				,Storehouses.ID AS StorehouseID						-- ID склада
-				,Customers.ID AS CustomerID							-- ID контрагента
-				,DeliveryPoints.ID AS TardeShopID					-- ID точки доставки (продажи)
-				,CreditLines.ID AS CreditLineID						-- ID кредитного направления
-				,Routes_.ID AS RouteID								-- ID марушрта (торгового представителя)
-				,Staff.ID AS AgentID								-- ID торгового агента (сотрудника)
-				,PriceTypes.ID AS TypePriceID						-- ID типа цены
+				CAST(RegSales._Период AS date) AS TransactionDate		-- Дата операции
+				,Documents.ID AS DocumentID								-- ID документа
+				,RegSales.НомерСтроки AS DocumentRow					-- Номер строки документа
+				,SalesDocuments.ID AS SalesDocumentID					-- ID документа продажи
+				,TransactionsType.ID AS TransactionTypeID				-- ID типа операции
+				,CASE
+					WHEN Business.ID <> Teams.BusinessID THEN ISNULL(Teams.BusinessID, Business.ID)
+					ELSE Business.ID
+				END AS BusinessID										-- ID направления бизнеса
+				,Organizations.ID AS CompanyID							-- ID организации
+				,Branches.ID AS BranchID								-- ID филиала
+				,Storehouses.ID AS StorehouseID							-- ID склада
+				,Customers.ID AS CustomerID								-- ID контрагента
+				,DeliveryPoints.ID AS TardeShopID						-- ID точки доставки (продажи)
+				,CreditLines.ID AS CreditLineID							-- ID кредитного направления
+				,Routes_.ID AS RouteID									-- ID марушрта (торгового представителя)
+				,Staff.ID AS AgentID									-- ID торгового агента (сотрудника)
+				,PriceTypes.ID AS TypePriceID							-- ID типа цены
 				,(	SELECT
 						ID
 					FROM t_TradeChanels
@@ -40,8 +43,8 @@ BEGIN
 									WHERE TradeChanel.ТочкаДоставки = RegSales.ТочкаДоставки
 											AND TradeChanel._Период <= RegSales._Период
 									ORDER BY TradeChanel._Период DESC) AS Реквизиты ON Реквизиты.ISISКанал = UID_1C
-				) AS TradeChanelID									-- ID канала торговли
-				,Goods.ID AS GoodID									-- ID номенклатуры
+				) AS TradeChanelID										-- ID канала торговли
+				,Goods.ID AS GoodID										-- ID номенклатуры
 				,(	SELECT
 						ID
 					FROM t_InitiativesTypes
@@ -63,7 +66,7 @@ BEGIN
 									) AS InitiativesTypes ON InitiativesTypes.InitiativesType = UID_1C
 
 				) AS InitiativesTypeID
-				,RegSales.Количество AS QuantityBase				-- Количество в базовых единицах измерения
+				,RegSales.Количество AS QuantityBase					-- Количество в базовых единицах измерения
 				,RegSales.Количество * ISNULL ((
 												SELECT TOP 1
 													CASE
@@ -126,11 +129,17 @@ BEGIN
 								WHERE Price.Номенклатура = RegSales.Номенклатура
 									AND Price._Период <= RegSales._Период
 								ORDER BY Price._Период DESC)
-						, 0) * RegSales.Количество AS AmountInInputPrices		-- Сумма во входных ценах
+						, 0) * RegSales.Количество AS AmountInInputPrices				-- Сумма во входных ценах
 			FROM [uas_central].dbo.РегистрНакопления_Продажи AS RegSales
 			INNER JOIN dbo.t_Documents AS Documents ON Documents.UID_1C = RegSales.Регистратор
 			LEFT JOIN dbo.t_SalesDocuments AS SalesDocuments ON SalesDocuments.UID_1C = RegSales.ДокументПродажи_Ссылка
 			LEFT JOIN dbo.t_TransactionsType AS TransactionsType ON TransactionsType.UID_1C = RegSales.ХозяйственнаяОперация
+			LEFT JOIN dbo.t_Routes AS Routes_ ON (Routes_.UID_1C = RegSales.Маршрут AND RegSales.Маршрут IS NOT NULL)
+												OR (Routes_.ID = SalesDocuments.RouteID AND RegSales.Маршрут IS NULL)
+			LEFT JOIN dbo.t_Teams AS Teams ON Teams.ID = Routes_.TeamID
+			LEFT JOIN dbo.t_Staff AS Staff ON (Staff.UID_1C = RegSales.ТорговыйАгент AND RegSales.ТорговыйАгент IS NOT NULL)
+											OR (Staff.ID = SalesDocuments.StaffID AND RegSales.ТорговыйАгент IS NULL)
+			LEFT JOIN dbo.t_PriceTypes AS PriceTypes ON PriceTypes.UID_1C = RegSales.ТипЦены
 			LEFT JOIN dbo.t_Business AS Business ON Business.UID_1C = RegSales.НаправлениеБизнеса
 			LEFT JOIN dbo.t_Organizations AS Organizations ON Organizations.UID_1C = RegSales.Организация
 			LEFT JOIN dbo.t_Branches AS Branches ON Branches.UID_1C = RegSales.Филиал
@@ -138,9 +147,6 @@ BEGIN
 			LEFT JOIN dbo.t_Customers AS Customers ON Customers.UID_1C = RegSales.Контрагент
 			LEFT JOIN dbo.t_DeliveryPoints AS DeliveryPoints ON DeliveryPoints.UID_1C = RegSales.ТочкаДоставки
 			LEFT JOIN dbo.t_CreditLines AS CreditLines ON CreditLines.UID_1C = RegSales.КредитноеНаправление
-			LEFT JOIN dbo.t_Routes AS Routes_ ON Routes_.UID_1C = RegSales.Маршрут
-			LEFT JOIN dbo.t_Staff AS Staff ON Staff.UID_1C = RegSales.ТорговыйАгент
-			LEFT JOIN dbo.t_PriceTypes AS PriceTypes ON PriceTypes.UID_1C = RegSales.ТипЦены
 			LEFT JOIN dbo.t_Goods AS Goods ON Goods.UID_1C = RegSales.Номенклатура
 			LEFT JOIN [uas_central].dbo.Справочник_ЕдиницыИзмерения AS MeasuresBase ON MeasuresBase.Ссылка = Goods.MeasuresBaseUID_1C AND MeasuresBase.ПометкаУдаления = 0
 			WHERE RegSales.Активность = 0x01

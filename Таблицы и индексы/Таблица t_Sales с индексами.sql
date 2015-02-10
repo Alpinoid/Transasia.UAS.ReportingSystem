@@ -146,7 +146,7 @@ GO
 ALTER TABLE [dbo].[t_Sales] CHECK CONSTRAINT [FK_t_Sales_t_Documents]
 GO
 
-ALTER TABLE [dbo].[t_Sales]  WITH CHECK ADD  CONSTRAINT [FK_t_Sales_t_Goods] FOREIGN KEY([GoodID])
+ALTER TABLE [dbo].[t_Sales]  WITH CHECK ADD CONSTRAINT [FK_t_Sales_t_Goods] FOREIGN KEY([GoodID])
 REFERENCES [dbo].[t_Goods] ([ID])
 GO
 

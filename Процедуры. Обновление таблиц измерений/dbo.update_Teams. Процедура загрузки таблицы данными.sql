@@ -14,10 +14,10 @@ BEGIN
 	MERGE INTO [dbo].[t_Teams] AS ReportingTable
 	USING (	
 			SELECT
-				Element.Ссылка AS UID_1C										-- ID Команды торговых агентов
-				,Element.Наименование AS Description							-- Наименование
-				,SystemsMobileTrade.ID AS SMT_ID								-- ID Системы мобильных продаж
-				,ISNULL(Bussiness.Description, 'Без направления') AS Business	-- Направление бизнеса
+				Element.Ссылка AS UID_1C					-- ID Команды торговых агентов
+				,Element.Наименование AS Description		-- Наименование
+				,SystemsMobileTrade.ID AS SMT_ID			-- ID Системы мобильных продаж
+				,Bussiness.ID  AS BusinessID				-- ID направления бизнеса
 			FROM [uas_central].dbo.Справочник_КомандыТорговыхАгентов AS Element														-- Справочник.КомандыТорговыхАгентов
 			LEFT JOIN dbo.t_Business AS Bussiness ON Bussiness.UID_1C = Element.НаправлениеБизнеса									-- Справочник.НаправленияБизнеса
 			LEFT JOIN dbo.t_SystemsMobileTrade AS SystemsMobileTrade ON SystemsMobileTrade.UID_1C  = Element.СистемаМобильныхПродаж	-- СистемыМобильныхПродаж
@@ -28,16 +28,16 @@ BEGIN
 			UPDATE
 			SET	Description	= From_1C.Description
 				,SMT_ID = From_1C.SMT_ID
-				,Business = From_1C.Business
+				,BusinessID = From_1C.BusinessID
 		WHEN NOT MATCHED BY TARGET THEN
 			INSERT (	UID_1C
 						,Description
 						,SMT_ID
-						,Business)
+						,BusinessID)
 			VALUES (	From_1C.UID_1C
 						,From_1C.Description
 						,From_1C.SMT_ID
-						,From_1C.Business);
+						,From_1C.BusinessID);
 
 END
 GO

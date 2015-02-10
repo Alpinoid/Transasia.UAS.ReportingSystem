@@ -24,9 +24,13 @@ BEGIN
 				,CAST(ISNULL(DocSales.ДатаФактическойДоставки, 0) AS date) AS DocDeliveryDate	-- Дата доставки
 				,CAST(ISNULL(DocSales.ДатаОплаты, 0)  AS date) AS DocPaymentDay					-- Дата оплаты
 				,CONVERT(int, DocSales.БонусныйДокумент) AS IsBonusDoc							-- Признак бонусного документа
+				,Routes_.ID AS RouteID															-- ID маршрута
+				,Staff.ID AS StaffID															-- ID торгового агента
 			FROM [uas_central].dbo.Документ_РеализацияТоваров AS DocSales						-- Документ.РеализацияТоваров
 			LEFT JOIN dbo.t_SalesDocumentsType AS SalesDocumentsType ON SalesDocumentsType.UID_1C = DocSales.ТипДокумента
 			LEFT JOIN dbo.t_PaymentsType AS PaymentsType ON PaymentsType.UID_1C = DocSales.СпособОплаты
+			LEFT JOIN dbo.t_Routes AS Routes_ ON Routes_.UID_1C = DocSales.Маршрут
+			LEFT JOIN dbo.t_Staff AS Staff ON Staff.UID_1C = DocSales.ТорговыйАгент
 			WHERE DocSales.Проведен = 0x01						-- Проведен
 			UNION ALL
 			SELECT
@@ -41,6 +45,8 @@ BEGIN
 				,CAST(ISNULL(DocSales.ДатаИсходногоДокумента, DocSales.Дата) AS date) AS DocDeliveryDate		-- Дата доставки
 				,CAST(ISNULL(DocSales.ДатаОплаты, 0)  AS date) AS DocPaymentDay									-- Дата оплаты
 				,CONVERT(int, DocSales.БонусныйДокумент) AS IsBonusDoc											-- Признак бонусного документа
+				,NULL AS RouteID																				-- ID маршрута
+				,NULL AS StaffID																				-- ID торгового агента
 			FROM [uas_central].dbo.Документ_ВводНачальныхОстатковВзаиморасчета AS DocSales		-- Документ.ВводНачальныхОстатковВзаиморасчета
 			LEFT JOIN dbo.t_SalesDocumentsType AS SalesDocumentsType ON SalesDocumentsType.UID_1C = DocSales.ТипДокумента
 			LEFT JOIN dbo.t_PaymentsType AS PaymentsType ON PaymentsType.UID_1C = DocSales.СпособОплаты
@@ -57,6 +63,8 @@ BEGIN
 				,DocDeliveryDate = From_1C.DocDeliveryDate
 				,DocPaymentDay = From_1C.DocPaymentDay
 				,IsBonusDoc = From_1C.IsBonusDoc
+				,RouteID = From_1C.RouteID
+				,StaffID = From_1C.StaffID
 		WHEN NOT MATCHED BY SOURCE THEN
 			DELETE
 		WHEN NOT MATCHED BY TARGET THEN
@@ -68,7 +76,9 @@ BEGIN
 						,PaymentMethodID
 						,DocDeliveryDate
 						,DocPaymentDay
-						,IsBonusDoc)
+						,IsBonusDoc
+						,RouteID
+						,StaffID)
 			VALUES (	From_1C.UID_1C
 						,From_1C.Description
 						,From_1C.DocDate
@@ -77,7 +87,9 @@ BEGIN
 						,From_1C.PaymentMethodID
 						,From_1C.DocDeliveryDate
 						,From_1C.DocPaymentDay
-						,From_1C.IsBonusDoc);
+						,From_1C.IsBonusDoc
+						,From_1C.RouteID
+						,From_1C.StaffID);
 
 END
 GO

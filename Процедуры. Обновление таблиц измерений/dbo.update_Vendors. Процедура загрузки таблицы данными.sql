@@ -24,13 +24,21 @@ BEGIN
 				,Vendors.Наименование + ' (' + Vendors.ИНН + ')' AS DescriptionINN	-- Наименование (ИНН)
 				,VendorsLegalAddress.Представление AS LegalAddress					-- Юридический адрес
 				,VendorsFactAddress.Представление AS FactAddress					-- Фактический адрес
-			FROM [uas_central].dbo.Справочник_Контрагенты AS Vendors																										-- Справочник.Контрагенты
-			LEFT JOIN [uas_central].dbo.Справочник_Контрагенты_КонтактнаяИнформация AS VendorsLegalAddress ON VendorsLegalAddress.Владелец = Vendors.Ссылка					-- Справочник.Контрагенты_КонтактнаяИнформация
-			INNER JOIN [uas_central].dbo.Справочник_ВидыКонтактнойИнформации AS VendorsTypeLegalAddress ON VendorsTypeLegalAddress.Ссылка = VendorsLegalAddress.Вид			-- Справочник.ВидыКонтактнойИнформации
-																				AND VendorsTypeLegalAddress.ИмяПредопределенныхДанных = 0xA581F8724C86FD9C4E1AA1B9D95035D6	-- Юридический адрес
-			LEFT JOIN [uas_central].dbo.Справочник_Контрагенты_КонтактнаяИнформация AS VendorsFactAddress ON VendorsFactAddress.Владелец = Vendors.Ссылка					-- Справочник.Контрагенты_КонтактнаяИнформация
-			INNER JOIN [uas_central].dbo.Справочник_ВидыКонтактнойИнформации AS VendorsTypeFactAddress ON VendorsTypeFactAddress.Ссылка = VendorsFactAddress.Вид			-- Справочник.ВидыКонтактнойИнформации
-																				AND VendorsTypeFactAddress.ИмяПредопределенныхДанных = 0x9F0111DE9B2A95ED4087A3968FFB5332	-- Фактически адрес
+			FROM [uas_central].dbo.Справочник_Контрагенты AS Vendors		-- Справочник.Контрагенты
+			LEFT JOIN (	SELECT
+							ElementFactAddress.Владелец AS Владелец
+							,ElementFactAddress.Представление AS Представление
+						FROM [uas_central].dbo.Справочник_Контрагенты_КонтактнаяИнформация AS ElementFactAddress																-- Справочник.Справочник_ТочкиДоставки_КонтактнаяИнформация
+						INNER JOIN [uas_central].dbo.Справочник_ВидыКонтактнойИнформации AS ElementTypeFactAddress ON ElementTypeFactAddress.Ссылка = ElementFactAddress.Вид	-- Справочник.ВидыКонтактнойИнформации
+																				AND ElementTypeFactAddress.ИмяПредопределенныхДанных = 0xA581F8724C86FD9C4E1AA1B9D95035D6		-- Юридический адрес
+					) AS VendorsLegalAddress ON VendorsLegalAddress.Владелец = Vendors.Ссылка
+			LEFT JOIN (	SELECT
+							ElementFactAddress.Владелец AS Владелец
+							,ElementFactAddress.Представление AS Представление
+						FROM [uas_central].dbo.Справочник_Контрагенты_КонтактнаяИнформация AS ElementFactAddress																-- Справочник.Справочник_ТочкиДоставки_КонтактнаяИнформация
+						INNER JOIN [uas_central].dbo.Справочник_ВидыКонтактнойИнформации AS ElementTypeFactAddress ON ElementTypeFactAddress.Ссылка = ElementFactAddress.Вид	-- Справочник.ВидыКонтактнойИнформации
+																				AND ElementTypeFactAddress.ИмяПредопределенныхДанных = 0x9F0111DE9B2A95ED4087A3968FFB5332		-- Фактически адрес
+					) AS VendorsFactAddress ON VendorsFactAddress.Владелец = Vendors.Ссылка
 			WHERE Vendors.Поставщик = 0x01	-- Поставщик
 			) AS From_1C
 	ON ReportingTable.UID_1C = From_1C.UID_1C

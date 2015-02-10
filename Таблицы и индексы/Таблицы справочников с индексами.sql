@@ -197,48 +197,15 @@ BEGIN
 
 END
 
--- Справочник.Контрагенты (Покупатели)
 BEGIN
-
-	IF OBJECT_ID('[dbo].[t_Customers]','U') IS NOT NULL
-		DROP TABLE [dbo].[t_Customers]
-
-	CREATE TABLE [dbo].[t_Customers](
-		[ID] [int] IDENTITY(1,1) NOT NULL,
-		[UID_1C] [binary](16) NOT NULL,
-		[Code] [varchar](11) NOT NULL,
-		[INN] [varchar](12) NOT NULL,
-		[Description] [varchar](100) NOT NULL,
-		[CodeDescription] [varchar](128) NOT NULL,
-		[DescriptionCode] [varchar](128) NOT NULL,
-		[INNDescription] [varchar](128) NOT NULL,
-		[DescriptionINN] [varchar](128) NOT NULL,
-		[LegalAddress] [varchar](500),
-		[FactAddress] [varchar](500),
-		[CustomerTypeID] [int] NOT NULL,
-	 CONSTRAINT [PK_Customers_ID] PRIMARY KEY CLUSTERED 
-	(
-		[ID] ASC
-	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-	) ON [PRIMARY]
-
-	CREATE NONCLUSTERED INDEX [t_Customers_UID] ON [dbo].[t_Customers]
-	(
-		[UID_1C] ASC
-	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
-
-	ALTER TABLE [dbo].[t_Customers]  WITH CHECK ADD  CONSTRAINT [FK_t_Customers_t_CustomersTypes] FOREIGN KEY([CustomerTypeID])
-	REFERENCES [dbo].[t_CustomersTypes] ([ID])
-
-	ALTER TABLE [dbo].[t_Customers] CHECK CONSTRAINT [FK_t_Customers_t_CustomersTypes]
-
-END
-
--- Справочник.ТипыКонтрагента
-BEGIN
+	
+	-- Справочник.ТипыКонтрагента
 
 	IF OBJECT_ID('[dbo].[t_CustomersTypes]','U') IS NOT NULL
-		DROP TABLE [dbo].[t_CustomersTypes]
+		BEGIN
+			ALTER TABLE [dbo].[t_Customers] DROP CONSTRAINT [FK_t_Customers_t_CustomersTypes]
+			DROP TABLE [dbo].[t_CustomersTypes]
+		END
 
 	CREATE TABLE [dbo].[t_CustomersTypes](
 		[ID] [int] IDENTITY(1,1) NOT NULL,
@@ -254,6 +221,46 @@ BEGIN
 	(
 		[UID_1C] ASC
 	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
+
+	-- Справочник.Контрагенты
+
+	IF OBJECT_ID('[dbo].[t_Customers]','U') IS NOT NULL
+		BEGIN
+			ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_Customers]
+			DROP TABLE [dbo].[t_Customers]
+		END
+
+	CREATE TABLE [dbo].[t_Customers](
+		[ID] [int] IDENTITY(1,1) NOT NULL,
+		[UID_1C] [binary](16) NOT NULL,
+		[Code] [varchar](11) NOT NULL,
+		[INN] [varchar](12) NOT NULL,
+		[Description] [varchar](100) NOT NULL,
+		[CodeDescription] [varchar](128) NOT NULL,
+		[DescriptionCode] [varchar](128) NOT NULL,
+		[INNDescription] [varchar](128) NOT NULL,
+		[DescriptionINN] [varchar](128) NOT NULL,
+		[LegalAddress] [varchar](500),
+		[FactAddress] [varchar](500),
+		[CustomerTypeID] [int] NOT NULL,
+		[IsBuyer] [bit] NOT NULL,
+		[IsContractor] [bit] NOT NULL,
+		[IsDeleted] [bit] NOT NULL
+	 CONSTRAINT [PK_Customers_ID] PRIMARY KEY CLUSTERED 
+	(
+		[ID] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+	) ON [PRIMARY]
+
+	CREATE NONCLUSTERED INDEX [t_Customers_UID] ON [dbo].[t_Customers]
+	(
+		[UID_1C] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
+
+	ALTER TABLE [dbo].[t_Customers]  WITH CHECK ADD  CONSTRAINT [FK_t_Customers_t_CustomersTypes] FOREIGN KEY([CustomerTypeID])
+	REFERENCES [dbo].[t_CustomersTypes] ([ID])
+
+	ALTER TABLE [dbo].[t_Customers] CHECK CONSTRAINT [FK_t_Customers_t_CustomersTypes]
 
 END
 
@@ -278,7 +285,10 @@ END
 BEGIN
 
 	IF OBJECT_ID('[dbo].[t_DeliveryPoints]','U') IS NOT NULL
-		DROP TABLE [dbo].[t_DeliveryPoints]
+		BEGIN
+			--ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_DeliveryPoints]
+			DROP TABLE [dbo].[t_DeliveryPoints]
+		END
 
 	CREATE TABLE [dbo].[t_DeliveryPoints](
 		[ID] [int] IDENTITY(1,1) NOT NULL,
@@ -289,6 +299,7 @@ BEGIN
 		[DescriptionCode] [varchar](128) NOT NULL,
 		[Branch] [varchar](50),
 		[GoldStoreType] [smallint] NOT NULL,
+		[FactAddress] [varchar](500),
 	 CONSTRAINT [PK_DeliveryPoints_ID] PRIMARY KEY CLUSTERED 
 	(
 		[ID] ASC
@@ -299,6 +310,11 @@ BEGIN
 	(
 		[UID_1C] ASC
 	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
+
+	ALTER TABLE [dbo].[t_DeliveryPoints]  WITH CHECK ADD  CONSTRAINT [FK_t_DeliveryPoints_t_TypesOfGoldStore] FOREIGN KEY([GoldStoreType])
+	REFERENCES [dbo].[t_TypesOfGoldStore] ([ID])
+
+	ALTER TABLE [dbo].[t_DeliveryPoints] CHECK CONSTRAINT [FK_t_DeliveryPoints_t_TypesOfGoldStore]
 
 END
 
@@ -346,14 +362,17 @@ END
 BEGIN
 
 	IF OBJECT_ID('[dbo].[t_Teams]','U') IS NOT NULL
-		DROP TABLE [dbo].[t_Teams]
+		BEGIN
+			ALTER TABLE [dbo].[t_Routes] DROP CONSTRAINT [FK_t_Routes_t_Teams]
+			DROP TABLE [dbo].[t_Teams]
+		END
 
 	CREATE TABLE [dbo].[t_Teams](
 		[ID] [int] IDENTITY(1,1) NOT NULL,
 		[UID_1C] [binary](16) NOT NULL,
 		[Description] [varchar](25) NOT NULL,
 		[SMT_ID] [int] NULL,
-		[Business] [varchar](50) NOT NULL,
+		[BusinessID] [int] NULL,
 	 CONSTRAINT [PK_Teams_ID] PRIMARY KEY CLUSTERED 
 	(
 		[ID] ASC
@@ -364,6 +383,11 @@ BEGIN
 	(
 		[UID_1C] ASC
 	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
+
+	ALTER TABLE [dbo].[t_Routes]  WITH CHECK ADD  CONSTRAINT [FK_t_Routes_t_Teams] FOREIGN KEY([TeamID])
+	REFERENCES [dbo].[t_Teams] ([ID])
+	
+	ALTER TABLE [dbo].[t_Routes] CHECK CONSTRAINT [FK_t_Routes_t_Teams]
 
 END
 
@@ -525,6 +549,8 @@ BEGIN
 		[DocDeliveryDate] [date] NULL,
 		[DocPaymentDay] [date] NULL,
 		[IsBonusDoc] [bit] NOT NULL,
+		[RouteID] [int] NULL,
+		[StaffID] [int] NULL,
 	 CONSTRAINT [PK_SalesDocuments_ID] PRIMARY KEY CLUSTERED 
 	(
 		[ID] ASC
@@ -638,13 +664,18 @@ END
 BEGIN
 
 	IF OBJECT_ID('[dbo].[t_TradeChanels]','U') IS NOT NULL
-		DROP TABLE [dbo].[t_TradeChanels]
+		BEGIN
+			ALTER TABLE [dbo].[t_TradeChanels] DROP CONSTRAINT [FK_Parent_t_TradeChanels]
+			ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_TradeChanels]
+			DROP TABLE [dbo].[t_TradeChanels]
+		END
 
 	CREATE TABLE [dbo].[t_TradeChanels](
 		[ID] [int] IDENTITY(1,1) NOT NULL,
+		[ParentID] [int] NULL,
 		[UID_1C] [binary](16) NOT NULL,
+		[UID_Parent_1C] [binary](16) NOT NULL,
 		[Description] [varchar](25) NOT NULL,
-		[ParentDescription] [varchar](25) NOT NULL,
 		[OfficialDescription] [varchar](70) NOT NULL,
 		[CodeISIS] [numeric](19,0) NOT NULL,
 		[IsKBD] [bit] NOT NULL
@@ -659,17 +690,32 @@ BEGIN
 		[UID_1C] ASC
 	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 
+	ALTER TABLE [dbo].[t_TradeChanels]  WITH CHECK ADD  CONSTRAINT [FK_Parent_t_TradeChanels] FOREIGN KEY([ParentID])
+	REFERENCES [dbo].[t_TradeChanels] ([ID])
+
+	ALTER TABLE [dbo].[t_TradeChanels] CHECK CONSTRAINT [FK_Parent_t_TradeChanels]
+
+	ALTER TABLE [dbo].[t_Sales]  WITH CHECK ADD  CONSTRAINT [FK_t_Sales_t_TradeChanels] FOREIGN KEY([TradeChanelID])
+	REFERENCES [dbo].[t_TradeChanels] ([ID])
+
+	ALTER TABLE [dbo].[t_Sales] CHECK CONSTRAINT [FK_t_Sales_t_TradeChanels]
+
 END
 
 -- Справочник.Номенклатура
 BEGIN
 
 	IF OBJECT_ID('[dbo].[t_Goods]','U') IS NOT NULL
-		DROP TABLE [dbo].[t_Goods]
+		BEGIN
+			ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_Goods]
+			DROP TABLE [dbo].[t_Goods]
+		END
 
 	CREATE TABLE [dbo].[t_Goods](
 		[ID] [int] IDENTITY(1,1) NOT NULL,
+		[ParentID] [int] NULL,
 		[UID_1C] [binary](16) NOT NULL,
+		[UID_Parent_1C] [binary](16) NOT NULL,
 		[Article] [varchar](25) NOT NULL,
 		[Description] [varchar](100) NOT NULL,
 		[ArticleDescription] [varchar](128) NOT NULL,
