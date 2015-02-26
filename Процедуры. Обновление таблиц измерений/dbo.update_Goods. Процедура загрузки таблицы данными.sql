@@ -20,8 +20,7 @@ BEGIN
 				,Element.Наименование AS Description													-- Наименование
 				,ISNULL(Element.Артикул, '')  + ': ' + Element.Наименование AS ArticleDescription		-- Артикул: Наименовнаие
 				,Element.Наименование + ' (' + ISNULL(Element.Артикул, '')  + ')' AS DescriptionArticle	-- Наименовнаие (Артикул)
-				,ISNULL(Bussiness.Description, 'Без направления') AS Business							-- Направление бизнеса
-				,CSKUElements.ID AS CSKU_ID																-- ID CSKU
+				,CSKU.ID AS CSKU_ID																-- ID CSKU
 				,Brands.ID AS BrandID																	-- ID бренда
 				,ISNULL (
 						(	SELECT TOP 1
@@ -30,14 +29,15 @@ BEGIN
 							LEFT JOIN [uas_central].dbo.Перечисление_СтавкиНДС AS VATValue ON VATValue.Значение = [uas_central].dbo.РегистрСведений_СтавкиНДС.НДС
 							WHERE [uas_central].dbo.РегистрСведений_СтавкиНДС.Номенклатура = Element.Ссылка
 							ORDER BY [uas_central].dbo.РегистрСведений_СтавкиНДС._Период DESC)
-						, 0) AS VAT															-- Става НДС
-				,MeasuresBase.Ссылка AS MeasuresBaseUID_1C									-- ID в 1С базовой единиуы измерения
+						, 0) AS VAT																		-- Става НДС
+				,MeasuresBase.Ссылка AS MeasuresBaseUID_1C												-- ID в 1С базовой единиуы измерения
 				,ISNULL(Element.MSU, 0) AS MSU															-- SU фактор
+				,Bussiness.ID  AS BusinessID															-- ID направления бизнеса
 			FROM [uas_central].dbo.Справочник_Номенклатура AS Element		-- Справочник.Номенклатура
 			LEFT JOIN dbo.t_Business AS Bussiness ON Bussiness.UID_1C = Element.НаправлениеБизнеса
 			LEFT JOIN dbo.t_Brands AS Brands ON Brands.UID_1C = Element.Бренд
-			LEFT JOIN uas_central.dbo.РегистрСведений_КодыCSKU AS CSKU ON CSKU.Номенклатура = Element.Ссылка
-			LEFT JOIN dbo.t_CSKUElements AS CSKUElements ON CSKUElements.UID_1C = CSKU.CSKU
+			LEFT JOIN uas_central.dbo.РегистрСведений_КодыCSKU AS КодыCSKU ON КодыCSKU.Номенклатура = Element.Ссылка
+			LEFT JOIN dbo.t_CSKU AS CSKU ON CSKU.UID_1C = КодыCSKU.CSKU
 			LEFT JOIN [uas_central].dbo.Справочник_ЕдиницыИзмерения AS MeasuresBase ON MeasuresBase.Ссылка = Element.БазоваяЕдиницаИзмерения
 			) AS From_1C
 	ON ReportingTable.UID_1C = From_1C.UID_1C
@@ -48,7 +48,7 @@ BEGIN
 				,Description = From_1C.Description
 				,ArticleDescription = From_1C.ArticleDescription
 				,DescriptionArticle = From_1C.DescriptionArticle
-				,Business = From_1C.Business
+				,BusinessID = From_1C.BusinessID
 				,CSKU_ID = From_1C.CSKU_ID
 				,BrandID = From_1C.BrandID
 				,VAT = From_1C.VAT
@@ -61,7 +61,7 @@ BEGIN
 						,Description
 						,ArticleDescription
 						,DescriptionArticle
-						,Business
+						,BusinessID
 						,CSKU_ID
 						,BrandID
 						,VAT
@@ -73,7 +73,7 @@ BEGIN
 						,From_1C.Description
 						,From_1C.ArticleDescription
 						,From_1C.DescriptionArticle
-						,From_1C.Business
+						,From_1C.BusinessID
 						,From_1C.CSKU_ID
 						,From_1C.BrandID
 						,From_1C.VAT

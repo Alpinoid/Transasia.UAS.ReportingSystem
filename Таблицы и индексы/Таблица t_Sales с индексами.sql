@@ -139,8 +139,6 @@ GO
 
 ALTER TABLE [dbo].[t_Sales]  WITH CHECK ADD  CONSTRAINT [FK_t_Sales_t_Documents] FOREIGN KEY([DocumentID])
 REFERENCES [dbo].[t_Documents] ([ID])
-ON UPDATE CASCADE
-ON DELETE CASCADE
 GO
 
 ALTER TABLE [dbo].[t_Sales] CHECK CONSTRAINT [FK_t_Sales_t_Documents]

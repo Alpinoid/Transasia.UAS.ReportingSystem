@@ -174,7 +174,7 @@ BEGIN
 
 END
 
--- Справочник.Справочник.Организации
+-- Справочник.Организации
 BEGIN
 
 	IF OBJECT_ID('[dbo].[t_Organizations]','U') IS NOT NULL
@@ -236,6 +236,7 @@ BEGIN
 		[Code] [varchar](11) NOT NULL,
 		[INN] [varchar](12) NOT NULL,
 		[Description] [varchar](100) NOT NULL,
+		[FullDescription] [varchar](256) NOT NULL,
 		[CodeDescription] [varchar](128) NOT NULL,
 		[DescriptionCode] [varchar](128) NOT NULL,
 		[INNDescription] [varchar](128) NOT NULL,
@@ -245,7 +246,8 @@ BEGIN
 		[CustomerTypeID] [int] NOT NULL,
 		[IsBuyer] [bit] NOT NULL,
 		[IsContractor] [bit] NOT NULL,
-		[IsDeleted] [bit] NOT NULL
+		[IsDeleted] [bit] NOT NULL,
+		[IsNonresident] [bit] NOT NULL
 	 CONSTRAINT [PK_Customers_ID] PRIMARY KEY CLUSTERED 
 	(
 		[ID] ASC
@@ -286,13 +288,14 @@ BEGIN
 
 	IF OBJECT_ID('[dbo].[t_DeliveryPoints]','U') IS NOT NULL
 		BEGIN
-			--ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_DeliveryPoints]
+			ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_DeliveryPoints]
 			DROP TABLE [dbo].[t_DeliveryPoints]
 		END
 
 	CREATE TABLE [dbo].[t_DeliveryPoints](
 		[ID] [int] IDENTITY(1,1) NOT NULL,
 		[UID_1C] [binary](16) NOT NULL,
+		[CustomerID] [int] NOT NULL,
 		[Code] [varchar](11) NOT NULL,
 		[Description] [varchar](100) NOT NULL,
 		[CodeDescription] [varchar](128) NOT NULL,
@@ -300,6 +303,7 @@ BEGIN
 		[Branch] [varchar](50),
 		[GoldStoreType] [smallint] NOT NULL,
 		[FactAddress] [varchar](500),
+		[IsKBD] [bit] NOT NULL,
 	 CONSTRAINT [PK_DeliveryPoints_ID] PRIMARY KEY CLUSTERED 
 	(
 		[ID] ASC
@@ -315,6 +319,11 @@ BEGIN
 	REFERENCES [dbo].[t_TypesOfGoldStore] ([ID])
 
 	ALTER TABLE [dbo].[t_DeliveryPoints] CHECK CONSTRAINT [FK_t_DeliveryPoints_t_TypesOfGoldStore]
+
+	ALTER TABLE [dbo].[t_Sales]  WITH CHECK ADD  CONSTRAINT [FK_t_Sales_t_DeliveryPoints] FOREIGN KEY([TardeShopID])
+	REFERENCES [dbo].[t_DeliveryPoints] ([ID])
+	
+	ALTER TABLE [dbo].[t_Sales] CHECK CONSTRAINT [FK_t_Sales_t_DeliveryPoints]
 
 END
 
@@ -490,12 +499,18 @@ END
 BEGIN
 
 	IF OBJECT_ID('[dbo].[t_Staff]','U') IS NOT NULL
-		DROP TABLE [dbo].[t_Staff]
+		BEGIN
+			ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_Staff]
+			ALTER TABLE [dbo].[t_Routes] DROP CONSTRAINT [FK_t_Routes_t_Staff]
+			ALTER TABLE [dbo].[t_SalesDocuments] DROP CONSTRAINT [FK_t_SalesDocuments_t_Staff]
+			DROP TABLE [dbo].[t_Staff]
+		END
 
 	CREATE TABLE [dbo].[t_Staff](
 		[ID] [int] IDENTITY(1,1) NOT NULL,
 		[UID_1C] [binary](16) NOT NULL,
 		[Description] [varchar](50) NOT NULL,
+		[Position] [varchar](100) NOT NULL,
 	 CONSTRAINT [PK_Staf_ID] PRIMARY KEY CLUSTERED 
 	(
 		[ID] ASC
@@ -506,6 +521,21 @@ BEGIN
 	(
 		[UID_1C] ASC
 	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
+
+	ALTER TABLE [dbo].[t_Sales]  WITH CHECK ADD  CONSTRAINT [FK_t_Sales_t_Staff] FOREIGN KEY([AgentID])
+	REFERENCES [dbo].[t_Staff] ([ID])
+	
+	ALTER TABLE [dbo].[t_Sales] CHECK CONSTRAINT [FK_t_Sales_t_Staff]
+
+	ALTER TABLE [dbo].[t_Routes]  WITH CHECK ADD  CONSTRAINT [FK_t_Routes_t_Staff] FOREIGN KEY([ManagerID])
+	REFERENCES [dbo].[t_Staff] ([ID])
+
+	ALTER TABLE [dbo].[t_Routes] CHECK CONSTRAINT [FK_t_Routes_t_Staff]
+
+	ALTER TABLE [dbo].[t_SalesDocuments]  WITH CHECK ADD  CONSTRAINT [FK_t_SalesDocuments_t_Staff] FOREIGN KEY([StaffID])
+	REFERENCES [dbo].[t_Staff] ([ID])
+
+	ALTER TABLE [dbo].[t_SalesDocuments] CHECK CONSTRAINT [FK_t_SalesDocuments_t_Staff]
 
 END
 
@@ -558,6 +588,29 @@ BEGIN
 	) ON [PRIMARY]
 
 	CREATE NONCLUSTERED INDEX [t_SalesDocuments_UID] ON [dbo].[t_SalesDocuments]
+	(
+		[UID_1C] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
+
+END
+
+-- Перечисление.СтатусыДокументовПродажи
+BEGIN
+
+	IF OBJECT_ID('[dbo].[t_SalesDocumentsStates]','U') IS NOT NULL
+		DROP TABLE [dbo].[t_SalesDocumentsStates]
+
+	CREATE TABLE [dbo].[t_SalesDocumentsStates](
+		[ID] [int] IDENTITY(1,1) NOT NULL,
+		[UID_1C] [binary](16) NOT NULL,
+		[Description] [varchar](50) NOT NULL,
+	 CONSTRAINT [PK_t_SalesDocumentsStates_ID] PRIMARY KEY CLUSTERED 
+	(
+		[ID] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+	) ON [PRIMARY]
+
+	CREATE NONCLUSTERED INDEX [t_SalesDocumentsStates_UID] ON [dbo].[t_SalesDocumentsStates]
 	(
 		[UID_1C] ASC
 	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
@@ -644,9 +697,12 @@ BEGIN
 		[ID] [int] IDENTITY(1,1) NOT NULL,
 		[UID_1C] [binary](16) NOT NULL,
 		[Description] [varchar](128) NOT NULL,
-		[DocumentsType] [int] NOT NULL,
+		[DocumentsTypeID] [int] NOT NULL,
 		[DocDate] [date] NOT NULL,
 		[DocNumber]  [varchar](21) NOT NULL,
+		[SalesDocumentTypeID] [int] NOT NULL,
+		[PaymentMethodID] [int] NOT NULL,
+		[IsBonusDoc] [bit] NOT NULL,
 	 CONSTRAINT [PK_Documents_ID] PRIMARY KEY CLUSTERED 
 	(
 		[ID] ASC
@@ -744,16 +800,17 @@ BEGIN
 
 END
 
--- Справочник.CSKU (элементы)
+-- Справочник.CSKU
 BEGIN
 
-	IF OBJECT_ID('[dbo].[t_CSKUElements]','U') IS NOT NULL
-		DROP TABLE [dbo].[t_CSKUElements]
+	IF OBJECT_ID('[dbo].[t_CSKU]','U') IS NOT NULL
+		DROP TABLE [dbo].[t_CSKU]
 
-	CREATE TABLE [dbo].[t_CSKUElements](
+	CREATE TABLE [dbo].[t_CSKU](
 		[ID] [int] IDENTITY(1,1) NOT NULL,
+		[ParentID] [int],
 		[UID_1C] [binary](16) NOT NULL,
-		[HierarchyID] [int],
+		[UID_Parent_1C] [binary](16) NOT NULL,
 		[Code] [varchar](9) NOT NULL,
 		[Description] [varchar](100) NOT NULL,
 		[CodeDescription] [varchar](128) NOT NULL,
@@ -764,44 +821,7 @@ BEGIN
 	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 	) ON [PRIMARY]
 
-	CREATE NONCLUSTERED INDEX [t_CSKUElements_UID] ON [dbo].[t_CSKUElements]
-	(
-		[UID_1C] ASC
-	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
-
-END
-
-
--- Справочник.CSKU (иерархия)
-BEGIN
-
-	IF OBJECT_ID('[dbo].[t_CSKUHierarchy]','U') IS NOT NULL
-		DROP TABLE [dbo].[t_CSKUHierarchy]
-
-	CREATE TABLE [dbo].[t_CSKUHierarchy](
-		[ID] [int] IDENTITY(1,1) NOT NULL,
-		[UID_1C] [binary](16) NOT NULL,
-		[Parent0_Code] [varchar](9) NOT NULL,
-		[Parent0_Description] [varchar](100) NOT NULL,
-		[Parent1_Code] [varchar](9),
-		[Parent1_Description] [varchar](100),
-		[Parent2_Code] [varchar](9),
-		[Parent2_Description] [varchar](100),
-		[Parent3_Code] [varchar](9),
-		[Parent3_Description] [varchar](100),
-		[Parent4_Code] [varchar](9),
-		[Parent4_Description] [varchar](100),
-		[Parent5_Code] [varchar](9),
-		[Parent5_Description] [varchar](100),
-		[Parent6_Code] [varchar](9),
-		[Parent6_Description] [varchar](100),
-	 CONSTRAINT [PK_CSKUHierarchy_ID] PRIMARY KEY CLUSTERED 
-	(
-		[ID] ASC
-	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-	) ON [PRIMARY]
-
-	CREATE NONCLUSTERED INDEX [t_CSKUHierarchy_UID] ON [dbo].[t_CSKUHierarchy]
+	CREATE NONCLUSTERED INDEX [t_CSKU_UID] ON [dbo].[t_CSKU]
 	(
 		[UID_1C] ASC
 	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
@@ -933,6 +953,47 @@ BEGIN
 	REFERENCES [dbo].[t_Sales] ([ID])
 
 	ALTER TABLE [dbo].[t_SalesMarketingPrograms] CHECK CONSTRAINT [FK_t_SalesMarketingPrograms_t_Sales]
+
+END
+
+-- Инициативы - Каналы продаж - Товары
+BEGIN
+
+	IF OBJECT_ID('[dbo].[t_InitiativesTradeChannelsGoods]','U') IS NOT NULL
+		DROP TABLE [dbo].[t_InitiativesTradeChannelsGoods]
+
+	CREATE TABLE [dbo].[t_InitiativesTradeChannelsGoods](
+		[InitiativeID] [int] NOT NULL,
+		[TradeChannelID] [int] NOT NULL,
+		[GoodID] [int] NOT NULL,
+	 CONSTRAINT [PK_t_InitiativesTradeChannelsGoods] PRIMARY KEY CLUSTERED 
+	(
+		[InitiativeID] ASC
+		,[TradeChannelID] ASC
+		,[GoodID] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+	) ON [PRIMARY]
+
+END
+
+SET ANSI_PADDING OFF
+GO
+
+-- Каналы продаж - Точки доставки
+BEGIN
+
+	IF OBJECT_ID('[dbo].[t_TradeChannelsDeliveryPoints]','U') IS NOT NULL
+		DROP TABLE [dbo].[t_TradeChannelsDeliveryPoints]
+
+	CREATE TABLE [dbo].[t_TradeChannelsDeliveryPoints](
+		[TradeChannelID] [int] NOT NULL,
+		[DeliveryPointID] [int] NOT NULL,
+	 CONSTRAINT [PK_t_TradeChannelsDeliveryPoints] PRIMARY KEY CLUSTERED 
+	(
+		[TradeChannelID] ASC
+		,[DeliveryPointID] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+	) ON [PRIMARY]
 
 END
 

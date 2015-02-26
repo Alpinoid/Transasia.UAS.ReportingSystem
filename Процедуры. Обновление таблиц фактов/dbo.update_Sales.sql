@@ -134,12 +134,13 @@ BEGIN
 			INNER JOIN dbo.t_Documents AS Documents ON Documents.UID_1C = RegSales.Регистратор
 			LEFT JOIN dbo.t_SalesDocuments AS SalesDocuments ON SalesDocuments.UID_1C = RegSales.ДокументПродажи_Ссылка
 			LEFT JOIN dbo.t_TransactionsType AS TransactionsType ON TransactionsType.UID_1C = RegSales.ХозяйственнаяОперация
-			LEFT JOIN dbo.t_Routes AS Routes_ ON (Routes_.UID_1C = RegSales.Маршрут AND RegSales.Маршрут IS NOT NULL)
-												OR (Routes_.ID = SalesDocuments.RouteID AND RegSales.Маршрут IS NULL)
+			LEFT JOIN dbo.t_Routes AS Routes_ ON (Routes_.UID_1C = RegSales.Маршрут AND ISNULL(RegSales.Маршрут, 0x00) <> 0x00)
+												OR (Routes_.ID = SalesDocuments.RouteID AND ISNULL(RegSales.Маршрут, 0x00) = 0x00)
 			LEFT JOIN dbo.t_Teams AS Teams ON Teams.ID = Routes_.TeamID
-			LEFT JOIN dbo.t_Staff AS Staff ON (Staff.UID_1C = RegSales.ТорговыйАгент AND RegSales.ТорговыйАгент IS NOT NULL)
-											OR (Staff.ID = SalesDocuments.StaffID AND RegSales.ТорговыйАгент IS NULL)
-			LEFT JOIN dbo.t_PriceTypes AS PriceTypes ON PriceTypes.UID_1C = RegSales.ТипЦены
+			LEFT JOIN dbo.t_Staff AS Staff ON (Staff.UID_1C = RegSales.ТорговыйАгент AND ISNULL(RegSales.ТорговыйАгент, 0x00) <> 0x00)
+											OR (Staff.ID = SalesDocuments.StaffID AND ISNULL(RegSales.ТорговыйАгент, 0x00) = 0x00)
+			LEFT JOIN dbo.t_PriceTypes AS PriceTypes ON (PriceTypes.UID_1C = RegSales.ТипЦены AND ISNULL(RegSales.ТипЦены, 0x00) <> 0x00)
+													OR (PriceTypes.ID = SalesDocuments.PriceTypeID AND ISNULL(RegSales.ТипЦены, 0x00) = 0x00)
 			LEFT JOIN dbo.t_Business AS Business ON Business.UID_1C = RegSales.НаправлениеБизнеса
 			LEFT JOIN dbo.t_Organizations AS Organizations ON Organizations.UID_1C = RegSales.Организация
 			LEFT JOIN dbo.t_Branches AS Branches ON Branches.UID_1C = RegSales.Филиал

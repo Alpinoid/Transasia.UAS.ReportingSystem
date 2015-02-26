@@ -26,11 +26,13 @@ BEGIN
 				,CONVERT(int, DocSales.БонусныйДокумент) AS IsBonusDoc							-- Признак бонусного документа
 				,Routes_.ID AS RouteID															-- ID маршрута
 				,Staff.ID AS StaffID															-- ID торгового агента
+				,PriceTypes.ID AS PriceTypeID													-- ID типа цены
 			FROM [uas_central].dbo.Документ_РеализацияТоваров AS DocSales						-- Документ.РеализацияТоваров
 			LEFT JOIN dbo.t_SalesDocumentsType AS SalesDocumentsType ON SalesDocumentsType.UID_1C = DocSales.ТипДокумента
 			LEFT JOIN dbo.t_PaymentsType AS PaymentsType ON PaymentsType.UID_1C = DocSales.СпособОплаты
 			LEFT JOIN dbo.t_Routes AS Routes_ ON Routes_.UID_1C = DocSales.Маршрут
 			LEFT JOIN dbo.t_Staff AS Staff ON Staff.UID_1C = DocSales.ТорговыйАгент
+			LEFT JOIN dbo.t_PriceTypes AS PriceTypes ON PriceTypes.UID_1C = DocSales.ТипЦены
 			WHERE DocSales.Проведен = 0x01						-- Проведен
 			UNION ALL
 			SELECT
@@ -47,6 +49,7 @@ BEGIN
 				,CONVERT(int, DocSales.БонусныйДокумент) AS IsBonusDoc											-- Признак бонусного документа
 				,NULL AS RouteID																				-- ID маршрута
 				,NULL AS StaffID																				-- ID торгового агента
+				,NULL AS StaPriceTypeID																			-- ID типа цены
 			FROM [uas_central].dbo.Документ_ВводНачальныхОстатковВзаиморасчета AS DocSales		-- Документ.ВводНачальныхОстатковВзаиморасчета
 			LEFT JOIN dbo.t_SalesDocumentsType AS SalesDocumentsType ON SalesDocumentsType.UID_1C = DocSales.ТипДокумента
 			LEFT JOIN dbo.t_PaymentsType AS PaymentsType ON PaymentsType.UID_1C = DocSales.СпособОплаты
@@ -65,6 +68,7 @@ BEGIN
 				,IsBonusDoc = From_1C.IsBonusDoc
 				,RouteID = From_1C.RouteID
 				,StaffID = From_1C.StaffID
+				,PriceTypeID = From_1C.PriceTypeID
 		WHEN NOT MATCHED BY SOURCE THEN
 			DELETE
 		WHEN NOT MATCHED BY TARGET THEN
@@ -78,7 +82,8 @@ BEGIN
 						,DocPaymentDay
 						,IsBonusDoc
 						,RouteID
-						,StaffID)
+						,StaffID
+						,PriceTypeID)
 			VALUES (	From_1C.UID_1C
 						,From_1C.Description
 						,From_1C.DocDate
@@ -89,7 +94,8 @@ BEGIN
 						,From_1C.DocPaymentDay
 						,From_1C.IsBonusDoc
 						,From_1C.RouteID
-						,From_1C.StaffID);
+						,From_1C.StaffID
+						,From_1C.PriceTypeID);
 
 END
 GO
