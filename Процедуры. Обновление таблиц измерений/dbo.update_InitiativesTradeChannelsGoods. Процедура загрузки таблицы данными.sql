@@ -49,6 +49,7 @@ BEGIN
 			INNER JOIN dbo.t_Goods AS Goods ON Goods.UID_1C = Номенклатура.Номенклатура
 			INNER JOIN dbo.t_InitiativesTypes AS InitiativesTypes ON InitiativesTypes.UID_1C = Initiatives.InitiativesType
 			INNER JOIN dbo.t_TradeChanels AS TradeChannels ON TradeChannels.UID_1C = Initiatives.TradeChannel
+															OR TradeChannels.UID_Parent_1C = Initiatives.TradeChannel
 			) AS From_1C
 		ON ReportingTable.InitiativeID = From_1C.InitiativeID
 			AND ReportingTable.TradeChannelID = From_1C.TradeChannelID
