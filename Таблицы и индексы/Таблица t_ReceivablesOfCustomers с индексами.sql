@@ -12,7 +12,7 @@ IF OBJECT_ID('[dbo].[t_ReceivablesOfCustomers]','U') IS NOT NULL
 GO
 
 CREATE TABLE [dbo].[t_ReceivablesOfCustomers](
-	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[ID] [bigint] IDENTITY(1,1) NOT NULL,
 	[ДатаЗадолженности] [date] NOT NULL,
 	[Организация] [binary](16) NOT NULL,
 	[НаправлениеБизнеса] [binary](16) NOT NULL,

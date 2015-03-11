@@ -14,6 +14,7 @@ BEGIN
 		DROP TABLE [dbo].[t_Calendar]
 
 	CREATE TABLE [dbo].[t_Calendar](
+		[DateID] [int] NOT NULL,
 		[Date] [date] NOT NULL,
 		[Year] [smallint] NOT NULL,
 		[Quarter] [tinyint] NOT NULL,
@@ -25,11 +26,40 @@ BEGIN
 		[DayOfMonth] [tinyint] NOT NULL,
 		[Weekday] [tinyint] NOT NULL,
 		[WeekdayName] [nvarchar](16) NOT NULL,
+		[CurrentMonthAndTwoPrevious] [nvarchar](3) NOT NULL,
 	PRIMARY KEY CLUSTERED 
 	(
-		[Date] ASC
+		[DateID] ASC
 	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 	) ON [PRIMARY]
+
+	CREATE NONCLUSTERED INDEX [t_Calendar_Date] ON [dbo].[t_Calendar]
+	(
+		[Date] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
+
+END
+
+-- Изменения в кубе
+BEGIN
+
+	IF OBJECT_ID('[dbo].[t_CubesChanges]','U') IS NOT NULL
+		DROP TABLE [dbo].[t_CubesChanges]
+
+	CREATE TABLE [dbo].[t_CubesChanges](
+		[ID] [int] IDENTITY(1,1) NOT NULL,
+		[DateID] [int] NOT NULL,
+		[Change] [varchar](1024) NOT NULL,
+	 CONSTRAINT [PK_CubesChanges_ID] PRIMARY KEY CLUSTERED 
+	(
+		[ID] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+	) ON [PRIMARY]
+
+	ALTER TABLE [dbo].[t_CubesChanges]  WITH CHECK ADD  CONSTRAINT [FK_t_CubesChanges_t_Calendar] FOREIGN KEY([DateID])
+	REFERENCES [dbo].[t_Calendar] ([DateID])
+
+	ALTER TABLE [dbo].[t_CubesChanges] CHECK CONSTRAINT [FK_t_CubesChanges_t_Calendar]
 
 END
 

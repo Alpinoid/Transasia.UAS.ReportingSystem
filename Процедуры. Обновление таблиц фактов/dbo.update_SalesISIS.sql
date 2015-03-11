@@ -3,20 +3,20 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-IF OBJECT_ID('[dbo].[update_Sales]','P') IS NOT NULL
-	DROP PROCEDURE [dbo].[update_Sales]
+IF OBJECT_ID('[dbo].[update_SalesISIS]','P') IS NOT NULL
+	DROP PROCEDURE [dbo].[update_SalesISIS]
 GO
 
-CREATE PROCEDURE [dbo].[update_Sales]
+CREATE PROCEDURE [dbo].[update_SalesISIS]
 	@StartDate date,
 	@EndDate date
 AS
 BEGIN
 
-	MERGE INTO dbo.t_Sales AS ReportingTable
+	MERGE INTO dbo.t_SalesISIS AS ReportingTable
 	USING (	
 			SELECT
-				CAST(CONVERT(varchar(8), RegSales._Период ,112) AS int) AS TransactionDateID		-- Дата операции
+				CAST(RegSales._Период AS date) AS TransactionDate		-- Дата операции
 				,Documents.ID AS DocumentID								-- ID документа
 				,RegSales.НомерСтроки AS DocumentRow					-- Номер строки документа
 				,SalesDocuments.ID AS SalesDocumentID					-- ID документа продажи
@@ -156,7 +156,7 @@ BEGIN
 	ON ReportingTable.DocumentID = From_1C.DocumentID AND ReportingTable.DocumentRow = From_1C.DocumentRow
 		WHEN MATCHED THEN
 			UPDATE
-			SET	TransactionDateID = From_1C.TransactionDateID
+			SET	TransactionDate = From_1C.TransactionDate
 				,SalesDocumentID = From_1C.SalesDocumentID
 				,TransactionTypeID = From_1C.TransactionTypeID
 				,BusinessID = From_1C.BusinessID
@@ -185,11 +185,10 @@ BEGIN
 				,Amount = From_1C.Amount
 				,AmountInCost = From_1C.AmountInCost
 				,AmountInInputPrices = From_1C.AmountInInputPrices
-		WHEN NOT MATCHED BY SOURCE AND (ReportingTable.TransactionDateID >= CAST(CONVERT(varchar(8), @StartDate ,112) AS int)
-										AND ReportingTable.TransactionDateID <= CAST(CONVERT(varchar(8), @EndDate ,112) AS int)) THEN
+		WHEN NOT MATCHED BY SOURCE AND ReportingTable.TransactionDate BETWEEN @StartDate AND @EndDate THEN
 			DELETE
 		WHEN NOT MATCHED BY TARGET THEN
-			INSERT (	TransactionDateID
+			INSERT (	TransactionDate
 						,DocumentID
 						,DocumentRow
 						,SalesDocumentID
@@ -220,7 +219,7 @@ BEGIN
 						,Amount
 						,AmountInCost
 						,AmountInInputPrices)
-			VALUES (	From_1C.TransactionDateID
+			VALUES (	From_1C.TransactionDate
 						,From_1C.DocumentID
 						,From_1C.DocumentRow
 						,From_1C.SalesDocumentID

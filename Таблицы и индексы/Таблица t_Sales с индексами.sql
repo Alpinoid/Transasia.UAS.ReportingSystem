@@ -23,9 +23,9 @@ IF OBJECT_ID('[dbo].[t_Sales]','U') IS NOT NULL
 
 		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_Organizations]
 
-		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_Goods]
-
 		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_InitiativesTypes]
+
+		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_Goods]
 
 		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_Documents]
 
@@ -35,7 +35,7 @@ IF OBJECT_ID('[dbo].[t_Sales]','U') IS NOT NULL
 
 		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_CreditLines]
 
-		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_Calendar]
+		--ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_Calendar]
 
 		ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_Business]
 
@@ -44,11 +44,10 @@ IF OBJECT_ID('[dbo].[t_Sales]','U') IS NOT NULL
 		DROP TABLE [dbo].[t_Sales]
 
 	END
-GO
 
 CREATE TABLE [dbo].[t_Sales](
 	[ID] [bigint] IDENTITY(1,1) NOT NULL,
-	[TransactionDate] [date] NOT NULL,
+	[TransactionDateID] [int] NOT NULL,
 	[DocumentID] [int] NOT NULL,
 	[DocumentRow] [int] NOT NULL,
 	[SalesDocumentID] [int] NULL,
@@ -87,14 +86,6 @@ CREATE TABLE [dbo].[t_Sales](
 
 GO
 
-CREATE UNIQUE NONCLUSTERED INDEX [t_Sales_DocumentIDAndRow] ON [dbo].[t_Sales]
-(
-	[DocumentID] ASC,
-	[DocumentRow] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
-
-GO
-
 ALTER TABLE [dbo].[t_Sales]  WITH CHECK ADD  CONSTRAINT [FK_t_Sales_t_Branches] FOREIGN KEY([BranchID])
 REFERENCES [dbo].[t_Branches] ([ID])
 GO
@@ -109,8 +100,8 @@ GO
 ALTER TABLE [dbo].[t_Sales] CHECK CONSTRAINT [FK_t_Sales_t_Business]
 GO
 
-ALTER TABLE [dbo].[t_Sales]  WITH CHECK ADD  CONSTRAINT [FK_t_Sales_t_Calendar] FOREIGN KEY([TransactionDate])
-REFERENCES [dbo].[t_Calendar] ([Date])
+ALTER TABLE [dbo].[t_Sales]  WITH CHECK ADD  CONSTRAINT [FK_t_Sales_t_Calendar] FOREIGN KEY([TransactionDateID])
+REFERENCES [dbo].[t_Calendar] ([DateID])
 GO
 
 ALTER TABLE [dbo].[t_Sales] CHECK CONSTRAINT [FK_t_Sales_t_Calendar]
@@ -144,11 +135,18 @@ GO
 ALTER TABLE [dbo].[t_Sales] CHECK CONSTRAINT [FK_t_Sales_t_Documents]
 GO
 
-ALTER TABLE [dbo].[t_Sales]  WITH CHECK ADD CONSTRAINT [FK_t_Sales_t_Goods] FOREIGN KEY([GoodID])
+ALTER TABLE [dbo].[t_Sales]  WITH CHECK ADD  CONSTRAINT [FK_t_Sales_t_Goods] FOREIGN KEY([GoodID])
 REFERENCES [dbo].[t_Goods] ([ID])
 GO
 
 ALTER TABLE [dbo].[t_Sales] CHECK CONSTRAINT [FK_t_Sales_t_Goods]
+GO
+
+ALTER TABLE [dbo].[t_Sales]  WITH CHECK ADD  CONSTRAINT [FK_t_Sales_t_InitiativesTypes] FOREIGN KEY([InitiativesTypeID])
+REFERENCES [dbo].[t_InitiativesTypes] ([ID])
+GO
+
+ALTER TABLE [dbo].[t_Sales] CHECK CONSTRAINT [FK_t_Sales_t_InitiativesTypes]
 GO
 
 ALTER TABLE [dbo].[t_Sales]  WITH CHECK ADD  CONSTRAINT [FK_t_Sales_t_Organizations] FOREIGN KEY([CompanyID])
@@ -202,16 +200,11 @@ GO
 ALTER TABLE [dbo].[t_Sales] CHECK CONSTRAINT [FK_t_Sales_t_TradeChanels]
 GO
 
-ALTER TABLE [dbo].[t_Sales]  WITH CHECK ADD  CONSTRAINT [FK_t_Sales_t_InitiativesTypes] FOREIGN KEY([InitiativesTypeID])
-REFERENCES [dbo].[t_InitiativesTypes] ([ID])
-GO
-
-ALTER TABLE [dbo].[t_Sales] CHECK CONSTRAINT [FK_t_Sales_t_InitiativesTypes]
-GO
-
 ALTER TABLE [dbo].[t_Sales]  WITH CHECK ADD  CONSTRAINT [FK_t_Sales_t_TransactionsType] FOREIGN KEY([TransactionTypeID])
 REFERENCES [dbo].[t_TransactionsType] ([ID])
 GO
 
 ALTER TABLE [dbo].[t_Sales] CHECK CONSTRAINT [FK_t_Sales_t_TransactionsType]
 GO
+
+
