@@ -18,7 +18,7 @@ BEGIN
 			SELECT
 				CAST(ISISTable.DUE_PERD AS int) AS TransactionDateID	-- Дата операции
 				,Documents.ID AS DocumentID								-- ID документа
-				,ISISTable._row_code AS DocumentRow						-- Номер строки документа
+				,ROW_NUMBER() OVER (ORDER BY Documents.ID, Goods.ID, ISISTable.NIV) AS DocumentRow						-- Номер строки документа
 				,SalesDocuments.ID AS SalesDocumentID					-- ID документа продажи
 				,TransactionsType.ID AS TransactionTypeID				-- ID типа операции
 				,CASE
@@ -78,16 +78,7 @@ BEGIN
 												FROM [uas_central].dbo.Справочник_ЕдиницыИзмерения AS MeasuresUnit
 												INNER JOIN [uas_central].dbo.Справочник_КлассификаторЕдиницИзмерения AS Class ON Class.Ссылка = MeasuresBase.БазоваяЕдиница
 												WHERE MeasuresUnit.Владелец = Goods.UID_1C), 0)
-									* ISNULL ((
-												SELECT TOP 1
-													CASE
-														WHEN ISNULL(MeasuresUnit.Коэффициент, 0) = 0 THEN 0
-														ELSE 1 / MeasuresUnit.Коэффициент
-													END
-												FROM [uas_central].dbo.Справочник_ЕдиницыИзмерения AS MeasuresUnit
-												INNER JOIN [uas_central].dbo.Справочник_КлассификаторЕдиницИзмерения AS Class ON MeasuresUnit.БазоваяЕдиница = Class.Ссылка
-																													AND Class.Код = '796'	-- [шт]
-												WHERE MeasuresUnit.Владелец = Goods.UID_1C), 0) AS QuantityUnit						-- Количество в [шт]
+									/ Goods.FactorUnit AS QuantityUnit						-- Количество в [шт]
 				,ISISTable.Volume AS QuantityBox						-- Количество в [кор]
 				,ISISTable.Volume	* ISNULL ((
 												SELECT TOP 1
@@ -95,32 +86,8 @@ BEGIN
 												FROM [uas_central].dbo.Справочник_ЕдиницыИзмерения AS MeasuresUnit
 												INNER JOIN [uas_central].dbo.Справочник_КлассификаторЕдиницИзмерения AS Class ON Class.Ссылка = MeasuresBase.БазоваяЕдиница
 												WHERE MeasuresUnit.Владелец = Goods.UID_1C), 0)
-									* ISNULL ((
-												SELECT TOP 1
-													CASE
-														WHEN ISNULL(MeasuresUnit.Коэффициент, 0) = 0 THEN 0
-														ELSE 1 / MeasuresUnit.Коэффициент
-													END
-												FROM [uas_central].dbo.Справочник_ЕдиницыИзмерения AS MeasuresUnit	-- Справочник.ЕдиницыИзмерения
-												INNER JOIN [uas_central].dbo.Справочник_КлассификаторЕдиницИзмерения AS Class ON MeasuresUnit.БазоваяЕдиница = Class.Ссылка
-																													AND Class.Код = '888'-- [уп]
-												WHERE MeasuresUnit.Владелец = Goods.UID_1C), 0) AS QuantityPack						-- Количество в [уп]
-				,ISISTable.Volume	* ISNULL ((
-												SELECT TOP 1
-													ISNULL(MeasuresUnit.Коэффициент, 0)
-												FROM [uas_central].dbo.Справочник_ЕдиницыИзмерения AS MeasuresUnit
-												INNER JOIN [uas_central].dbo.Справочник_КлассификаторЕдиницИзмерения AS Class ON Class.Ссылка = MeasuresBase.БазоваяЕдиница
-												WHERE MeasuresUnit.Владелец = Goods.UID_1C), 0)
-									* ISNULL ((
-												SELECT TOP 1
-													CASE
-														WHEN ISNULL(MeasuresUnit.Коэффициент, 0) = 0 THEN 0
-														ELSE 1 / MeasuresUnit.Коэффициент
-													END
-												FROM [uas_central].dbo.Справочник_ЕдиницыИзмерения AS MeasuresUnit	-- Справочник.ЕдиницыИзмерения
-												INNER JOIN [uas_central].dbo.Справочник_КлассификаторЕдиницИзмерения AS Class ON MeasuresUnit.БазоваяЕдиница = Class.Ссылка
-																													AND Class.Код = '384'	-- [кор]
-												WHERE MeasuresUnit.Владелец = Goods.UID_1C), 0) * Goods.MSU / 1000 AS QuantityMSU	-- Количество в [MSU]
+									/ Goods.FactorPack AS QuantityPack						-- Количество в [уп]
+				,ISISTable.Volume	* Goods.MSU / 1000 AS QuantityMSU							-- Количество в [MSU]
 				,ISISTable.Volume	* ISNULL ((
 												SELECT TOP 1
 													ISNULL(MeasuresUnit.Коэффициент, 0)

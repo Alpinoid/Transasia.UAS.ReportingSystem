@@ -810,8 +810,12 @@ BEGIN
 		[CSKU_ID] [int],
 		[BrandID] [int],
 		[VAT] [numeric](2,0) NOT NULL,
-		[MeasuresBaseUID_1C] [binary](16),
+		[MeasuresBaseUID_1C] [binary](16) NOT NULL,
 		[MSU] [numeric](10,3) NOT NULL,
+		[BusinessID] [int] NOT NULL,
+		[FactorUnit] [numeric](8, 3) NOT NULL,
+		[FactorBox] [numeric](8, 3) NOT NULL,
+		[FactorPack] [numeric](8, 3) NOT NULL,
 	 CONSTRAINT [PK_Goods_ID] PRIMARY KEY CLUSTERED 
 	(
 		[ID] ASC

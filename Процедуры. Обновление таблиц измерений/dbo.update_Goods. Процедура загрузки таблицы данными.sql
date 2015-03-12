@@ -33,6 +33,27 @@ BEGIN
 				,MeasuresBase.Ссылка AS MeasuresBaseUID_1C												-- ID в 1С базовой единиуы измерения
 				,ISNULL(Element.MSU, 0) AS MSU															-- SU фактор
 				,Bussiness.ID  AS BusinessID															-- ID направления бизнеса
+				,ISNULL ((
+							SELECT TOP 1
+								MeasuresUnit.Коэффициент
+							FROM [uas_central].dbo.Справочник_ЕдиницыИзмерения AS MeasuresUnit
+							INNER JOIN [uas_central].dbo.Справочник_КлассификаторЕдиницИзмерения AS Class ON MeasuresUnit.БазоваяЕдиница = Class.Ссылка
+																								AND Class.Код = '796'	-- [шт]
+							WHERE MeasuresUnit.Владелец = Element.Ссылка), 1) AS FactorUnit				-- Коэффициент пересчета в штуки
+				,ISNULL ((
+							SELECT TOP 1
+								MeasuresUnit.Коэффициент
+							FROM [uas_central].dbo.Справочник_ЕдиницыИзмерения AS MeasuresUnit
+							INNER JOIN [uas_central].dbo.Справочник_КлассификаторЕдиницИзмерения AS Class ON MeasuresUnit.БазоваяЕдиница = Class.Ссылка
+																								AND Class.Код = '384'	-- [кор]
+							WHERE MeasuresUnit.Владелец = Element.Ссылка), 1) AS FactorBox				-- Коэффициент пересчета в коробки
+				,ISNULL ((
+							SELECT TOP 1
+								MeasuresUnit.Коэффициент
+							FROM [uas_central].dbo.Справочник_ЕдиницыИзмерения AS MeasuresUnit
+							INNER JOIN [uas_central].dbo.Справочник_КлассификаторЕдиницИзмерения AS Class ON MeasuresUnit.БазоваяЕдиница = Class.Ссылка
+																								AND Class.Код = '888'	-- [уп]
+							WHERE MeasuresUnit.Владелец = Element.Ссылка), 1) AS FactorPack				-- Коэффициент пересчета в упаковки
 			FROM [uas_central].dbo.Справочник_Номенклатура AS Element		-- Справочник.Номенклатура
 			LEFT JOIN dbo.t_Business AS Bussiness ON Bussiness.UID_1C = Element.НаправлениеБизнеса
 			LEFT JOIN dbo.t_Brands AS Brands ON Brands.UID_1C = Element.Бренд
@@ -54,6 +75,9 @@ BEGIN
 				,VAT = From_1C.VAT
 				,MeasuresBaseUID_1C = From_1C.MeasuresBaseUID_1C
 				,MSU = From_1C.MSU
+				,FactorUnit = From_1C.FactorUnit
+				,FactorBox = From_1C.FactorBox
+				,FactorPack = From_1C.FactorPack
 		WHEN NOT MATCHED BY TARGET THEN
 			INSERT (	UID_1C
 						,UID_Parent_1C
@@ -66,7 +90,10 @@ BEGIN
 						,BrandID
 						,VAT
 						,MeasuresBaseUID_1C
-						,MSU)
+						,MSU
+						,FactorUnit
+						,FactorBox
+						,FactorPack)
 			VALUES (	From_1C.UID_1C
 						,From_1C.UID_Parent_1C
 						,From_1C.Article
@@ -78,7 +105,10 @@ BEGIN
 						,From_1C.BrandID
 						,From_1C.VAT
 						,From_1C.MeasuresBaseUID_1C
-						,From_1C.MSU);
+						,From_1C.MSU
+						,From_1C.FactorUnit
+						,From_1C.FactorBox
+						,From_1C.FactorPack);
 
 	UPDATE dbo.t_Goods
 		SET dbo.t_Goods.ParentID = Parent.ID
