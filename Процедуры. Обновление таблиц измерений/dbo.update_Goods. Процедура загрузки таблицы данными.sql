@@ -35,21 +35,21 @@ BEGIN
 				,Bussiness.ID  AS BusinessID															-- ID направления бизнеса
 				,ISNULL ((
 							SELECT TOP 1
-								MeasuresUnit.Коэффициент
+								IIF(MeasuresUnit.Коэффициент = 0, 1, MeasuresUnit.Коэффициент) AS Коэффициент
 							FROM [uas_central].dbo.Справочник_ЕдиницыИзмерения AS MeasuresUnit
 							INNER JOIN [uas_central].dbo.Справочник_КлассификаторЕдиницИзмерения AS Class ON MeasuresUnit.БазоваяЕдиница = Class.Ссылка
 																								AND Class.Код = '796'	-- [шт]
 							WHERE MeasuresUnit.Владелец = Element.Ссылка), 1) AS FactorUnit				-- Коэффициент пересчета в штуки
 				,ISNULL ((
 							SELECT TOP 1
-								MeasuresUnit.Коэффициент
+								IIF(MeasuresUnit.Коэффициент = 0, 1, MeasuresUnit.Коэффициент) AS Коэффициент
 							FROM [uas_central].dbo.Справочник_ЕдиницыИзмерения AS MeasuresUnit
 							INNER JOIN [uas_central].dbo.Справочник_КлассификаторЕдиницИзмерения AS Class ON MeasuresUnit.БазоваяЕдиница = Class.Ссылка
 																								AND Class.Код = '384'	-- [кор]
 							WHERE MeasuresUnit.Владелец = Element.Ссылка), 1) AS FactorBox				-- Коэффициент пересчета в коробки
 				,ISNULL ((
 							SELECT TOP 1
-								MeasuresUnit.Коэффициент
+								IIF(MeasuresUnit.Коэффициент = 0, 1, MeasuresUnit.Коэффициент) AS Коэффициент
 							FROM [uas_central].dbo.Справочник_ЕдиницыИзмерения AS MeasuresUnit
 							INNER JOIN [uas_central].dbo.Справочник_КлассификаторЕдиницИзмерения AS Class ON MeasuresUnit.БазоваяЕдиница = Class.Ссылка
 																								AND Class.Код = '888'	-- [уп]

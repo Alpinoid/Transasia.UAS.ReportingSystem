@@ -27,13 +27,17 @@ IF OBJECT_ID('[dbo].[t_SalesISIS]','U') IS NOT NULL
 
 		ALTER TABLE [dbo].[t_SalesISIS] DROP CONSTRAINT [FK_t_SalesISIS_t_Organizations]
 
-		ALTER TABLE [dbo].[t_SalesISIS] DROP CONSTRAINT [FK_t_SalesISIS_t_Goods]
-
 		ALTER TABLE [dbo].[t_SalesISIS] DROP CONSTRAINT [FK_t_SalesISIS_t_InitiativesTypes]
+
+		ALTER TABLE [dbo].[t_SalesISIS] DROP CONSTRAINT [FK_t_SalesISIS_t_ods]
 
 		ALTER TABLE [dbo].[t_SalesISIS] DROP CONSTRAINT [FK_t_SalesISIS_t_Documents]
 
+		ALTER TABLE [dbo].[t_SalesISIS] DROP CONSTRAINT [FK_t_SalesISIS_t_DeliveryPointsISIS]
+
 		ALTER TABLE [dbo].[t_SalesISIS] DROP CONSTRAINT [FK_t_SalesISIS_t_DeliveryPoints]
+
+		ALTER TABLE [dbo].[t_SalesISIS] DROP CONSTRAINT [FK_t_SalesISIS_t_CustomersISIS]
 
 		ALTER TABLE [dbo].[t_SalesISIS] DROP CONSTRAINT [FK_t_SalesISIS_t_Customers]
 
@@ -42,6 +46,8 @@ IF OBJECT_ID('[dbo].[t_SalesISIS]','U') IS NOT NULL
 		ALTER TABLE [dbo].[t_SalesISIS] DROP CONSTRAINT [FK_t_SalesISIS_t_Calendar]
 
 		ALTER TABLE [dbo].[t_SalesISIS] DROP CONSTRAINT [FK_t_SalesISIS_t_Business]
+
+		ALTER TABLE [dbo].[t_SalesISIS] DROP CONSTRAINT [FK_t_SalesISIS_t_BranchesISIS]
 
 		ALTER TABLE [dbo].[t_SalesISIS] DROP CONSTRAINT [FK_t_SalesISIS_t_Branches]
 
@@ -60,9 +66,12 @@ CREATE TABLE [dbo].[t_SalesISIS](
 	[BusinessID] [int] NOT NULL,
 	[CompanyID] [int] NOT NULL,
 	[BranchID] [int] NULL,
+	[BranchISISID] [int] NULL,
 	[StorehouseID] [int] NOT NULL,
 	[CustomerID] [int] NULL,
+	[CustomerISISID] [int] NULL,
 	[TardeShopID] [int] NULL,
+	[TardeShopISISID] [int] NULL,
 	[CreditLineID] [int] NULL,
 	[RouteID] [int] NULL,
 	[AgentID] [int] NULL,
@@ -98,6 +107,13 @@ GO
 ALTER TABLE [dbo].[t_SalesISIS] CHECK CONSTRAINT [FK_t_SalesISIS_t_Branches]
 GO
 
+ALTER TABLE [dbo].[t_SalesISIS]  WITH CHECK ADD  CONSTRAINT [FK_t_SalesISIS_t_BranchesISIS] FOREIGN KEY([BranchISISID])
+REFERENCES [dbo].[t_Branches] ([ID])
+GO
+
+ALTER TABLE [dbo].[t_SalesISIS] CHECK CONSTRAINT [FK_t_SalesISIS_t_BranchesISIS]
+GO
+
 ALTER TABLE [dbo].[t_SalesISIS]  WITH CHECK ADD  CONSTRAINT [FK_t_SalesISIS_t_Business] FOREIGN KEY([BusinessID])
 REFERENCES [dbo].[t_Business] ([ID])
 GO
@@ -126,11 +142,25 @@ GO
 ALTER TABLE [dbo].[t_SalesISIS] CHECK CONSTRAINT [FK_t_SalesISIS_t_Customers]
 GO
 
+ALTER TABLE [dbo].[t_SalesISIS]  WITH CHECK ADD  CONSTRAINT [FK_t_SalesISIS_t_CustomersISIS] FOREIGN KEY([CustomerISISID])
+REFERENCES [dbo].[t_Customers] ([ID])
+GO
+
+ALTER TABLE [dbo].[t_SalesISIS] CHECK CONSTRAINT [FK_t_SalesISIS_t_CustomersISIS]
+GO
+
 ALTER TABLE [dbo].[t_SalesISIS]  WITH CHECK ADD  CONSTRAINT [FK_t_SalesISIS_t_DeliveryPoints] FOREIGN KEY([TardeShopID])
 REFERENCES [dbo].[t_DeliveryPoints] ([ID])
 GO
 
 ALTER TABLE [dbo].[t_SalesISIS] CHECK CONSTRAINT [FK_t_SalesISIS_t_DeliveryPoints]
+GO
+
+ALTER TABLE [dbo].[t_SalesISIS]  WITH CHECK ADD  CONSTRAINT [FK_t_SalesISIS_t_DeliveryPointsISIS] FOREIGN KEY([TardeShopISISID])
+REFERENCES [dbo].[t_DeliveryPoints] ([ID])
+GO
+
+ALTER TABLE [dbo].[t_SalesISIS] CHECK CONSTRAINT [FK_t_SalesISIS_t_DeliveryPointsISIS]
 GO
 
 ALTER TABLE [dbo].[t_SalesISIS]  WITH CHECK ADD  CONSTRAINT [FK_t_SalesISIS_t_Documents] FOREIGN KEY([DocumentID])
@@ -211,5 +241,3 @@ GO
 
 ALTER TABLE [dbo].[t_SalesISIS] CHECK CONSTRAINT [FK_t_SalesISIS_t_TransactionsType]
 GO
-
-

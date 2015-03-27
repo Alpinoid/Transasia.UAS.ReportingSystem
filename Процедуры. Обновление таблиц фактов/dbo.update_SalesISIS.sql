@@ -14,7 +14,7 @@ AS
 BEGIN
 
 	MERGE INTO dbo.t_SalesISIS AS ReportingTable
-	USING (	
+		USING (	
 			SELECT
 				CAST(ISISTable.DUE_PERD AS int) AS TransactionDateID	-- Дата операции
 				,Documents.ID AS DocumentID								-- ID документа
@@ -27,9 +27,13 @@ BEGIN
 				END AS BusinessID										-- ID направления бизнеса
 				,Organizations.ID AS CompanyID							-- ID организации
 				,Branches.ID AS BranchID								-- ID филиала
+				,BranchesISIS.ID AS BranchISISID						-- ID филиала по ISIS
+				,pg_filial.filial
 				,Storehouses.ID AS StorehouseID							-- ID склада
 				,Customers.ID AS CustomerID								-- ID контрагента
+				,CustomersISIS.ID AS CustomerISISID						-- ID контрагента по ISIS
 				,DeliveryPoints.ID AS TardeShopID						-- ID точки доставки (продажи)
+				,DeliveryPointsISIS.ID AS TardeShopISISID				-- ID точки доставки (продажи) по ISIS
 				,CreditLines.ID AS CreditLineID							-- ID кредитного направления
 				,Routes_.ID AS RouteID									-- ID марушрта (торгового представителя)
 				,Staff.ID AS AgentID									-- ID торгового агента (сотрудника)
@@ -155,9 +159,13 @@ BEGIN
 			LEFT JOIN dbo.t_Business AS Business ON Business.UID_1C = SalesDoc_1C.НаправлениеБизнеса
 			LEFT JOIN dbo.t_Organizations AS Organizations ON Organizations.UID_1C = SalesDoc_1C.Организация
 			LEFT JOIN dbo.t_Branches AS Branches ON Branches.UID_1C = SalesDoc_1C.Филиал
+			LEFT JOIN [pg_reports].dbo.pg_filial_codes AS pg_filial ON pg_filial.pg_code = ISISTable.DIST_ID
+			LEFT JOIN dbo.t_Branches AS BranchesISIS ON BranchesISIS.UID_1C = pg_filial.UID_1C
 			LEFT JOIN dbo.t_Storehouses AS Storehouses ON Storehouses.UID_1C = SalesDoc_1C.Склад
-			LEFT JOIN dbo.t_DeliveryPoints AS DeliveryPoints ON DeliveryPoints.UID_1C = ISISTable._client_id_new
-			LEFT JOIN dbo.t_Customers AS Customers ON Customers.UID_1C = (SELECT TOP 1 Владелец FROM [uas_central].dbo.Справочник_ТочкиДоставки WHERE Ссылка = ISISTable._client_id_new)
+			LEFT JOIN dbo.t_DeliveryPoints AS DeliveryPoints ON DeliveryPoints.UID_1C = SalesDoc_1C.ТочкаДоставки
+			LEFT JOIN dbo.t_Customers AS Customers ON Customers.UID_1C = SalesDoc_1C.Контрагент
+			LEFT JOIN dbo.t_DeliveryPoints AS DeliveryPointsISIS ON DeliveryPointsISIS.UID_1C = ISISTable._client_id_new
+			LEFT JOIN dbo.t_Customers AS CustomersISIS ON CustomersISIS.UID_1C = (SELECT TOP 1 Владелец FROM [uas_central].dbo.Справочник_ТочкиДоставки WHERE Ссылка = ISISTable._client_id_new)
 			LEFT JOIN dbo.t_CreditLines AS CreditLines ON CreditLines.UID_1C = SalesDoc_1C.КредитноеНаправление
 			LEFT JOIN dbo.t_Goods AS Goods ON Goods.UID_1C = ISISTable._tovar_id_new
 			LEFT JOIN [uas_central].dbo.Справочник_ЕдиницыИзмерения AS MeasuresBase ON MeasuresBase.Ссылка = Goods.MeasuresBaseUID_1C AND MeasuresBase.ПометкаУдаления = 0
@@ -172,9 +180,12 @@ BEGIN
 				,BusinessID = From_1C.BusinessID
 				,CompanyID = From_1C.CompanyID
 				,BranchID = From_1C.BranchID
+				,BranchISISID = From_1C.BranchISISID
 				,StorehouseID = From_1C.StorehouseID
 				,CustomerID = From_1C.CustomerID
+				,CustomerISISID = From_1C.CustomerISISID
 				,TardeShopID = From_1C.TardeShopID
+				,TardeShopISISID = From_1C.TardeShopISISID
 				,CreditLineID = From_1C.CreditLineID
 				,RouteID = From_1C.RouteID
 				,AgentID = From_1C.AgentID
@@ -207,9 +218,12 @@ BEGIN
 						,BusinessID
 						,CompanyID
 						,BranchID
+						,BranchISISID
 						,StorehouseID
 						,CustomerID
+						,CustomerISISID
 						,TardeShopID
+						,TardeShopISISID
 						,CreditLineID
 						,RouteID
 						,AgentID
@@ -238,9 +252,12 @@ BEGIN
 						,From_1C.BusinessID
 						,From_1C.CompanyID
 						,From_1C.BranchID
+						,From_1C.BranchISISID
 						,From_1C.StorehouseID
 						,From_1C.CustomerID
+						,From_1C.CustomerISISID
 						,From_1C.TardeShopID
+						,From_1C.TardeShopISISID
 						,From_1C.CreditLineID
 						,From_1C.RouteID
 						,From_1C.AgentID
