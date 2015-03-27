@@ -753,6 +753,9 @@ BEGIN
 		BEGIN
 			ALTER TABLE [dbo].[t_TradeChanels] DROP CONSTRAINT [FK_Parent_t_TradeChanels]
 			ALTER TABLE [dbo].[t_Sales] DROP CONSTRAINT [FK_t_Sales_t_TradeChanels]
+			ALTER TABLE [dbo].[t_SalesISIS] DROP CONSTRAINT [FK_t_SalesISIS_t_TradeChanels]
+			ALTER TABLE [dbo].[t_TradeChannelsDeliveryPoints] DROP CONSTRAINT [FK_t_TradeChannelsDeliveryPoints_t_TradeChanels]
+			ALTER TABLE [dbo].[t_InitiativesTradeChannelsGoods] DROP CONSTRAINT [FK_t_InitiativesTradeChannelsGoods_t_TradeChanels]
 			DROP TABLE [dbo].[t_TradeChanels]
 		END
 
@@ -785,6 +788,21 @@ BEGIN
 	REFERENCES [dbo].[t_TradeChanels] ([ID])
 
 	ALTER TABLE [dbo].[t_Sales] CHECK CONSTRAINT [FK_t_Sales_t_TradeChanels]
+
+	ALTER TABLE [dbo].[t_SalesISIS]  WITH CHECK ADD  CONSTRAINT [FK_t_SalesISIS_t_TradeChanels] FOREIGN KEY([TradeChanelID])
+	REFERENCES [dbo].[t_TradeChanels] ([ID])
+
+	ALTER TABLE [dbo].[t_SalesISIS] CHECK CONSTRAINT [FK_t_SalesISIS_t_TradeChanels]
+
+	ALTER TABLE [dbo].[t_TradeChannelsDeliveryPoints]  WITH CHECK ADD  CONSTRAINT [FK_t_TradeChannelsDeliveryPoints_t_TradeChanels] FOREIGN KEY([TradeChannelID])
+	REFERENCES [dbo].[t_TradeChanels] ([ID])
+
+	ALTER TABLE [dbo].[t_TradeChannelsDeliveryPoints] CHECK CONSTRAINT [FK_t_TradeChannelsDeliveryPoints_t_TradeChanels]
+
+	ALTER TABLE [dbo].[t_InitiativesTradeChannelsGoods]  WITH CHECK ADD  CONSTRAINT [FK_t_InitiativesTradeChannelsGoods_t_TradeChanels] FOREIGN KEY([TradeChannelID])
+	REFERENCES [dbo].[t_TradeChanels] ([ID])
+
+	ALTER TABLE [dbo].[t_InitiativesTradeChannelsGoods] CHECK CONSTRAINT [FK_t_InitiativesTradeChannelsGoods_t_TradeChanels]
 
 END
 
@@ -1026,6 +1044,43 @@ BEGIN
 	(
 		[TradeChannelID] ASC
 		,[DeliveryPointID] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+	) ON [PRIMARY]
+
+END
+
+-- Периоды временных снижений цены
+BEGIN
+
+	IF OBJECT_ID('[dbo].[t_PeriodsOfTPR]','U') IS NOT NULL
+		DROP TABLE [dbo].[t_PeriodsOfTPR]
+
+	CREATE TABLE [dbo].[t_PeriodsOfTPR](
+		[ID] [int] IDENTITY(1,1) NOT NULL,
+		[Description] [varchar](100) NOT NULL,
+		[StartDate] [date] NOT NULL,
+		[EndDate] [date] NOT NULL,
+	 CONSTRAINT [PK_PeriodsOfTPR_ID] PRIMARY KEY CLUSTERED 
+	(
+		[ID] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+	) ON [PRIMARY]
+
+END
+
+-- CSKU - Периоды TPR
+BEGIN
+
+	IF OBJECT_ID('[dbo].[t_CSKUPeriodsOfTPR]','U') IS NOT NULL
+		DROP TABLE [dbo].[t_CSKUPeriodsOfTPR]
+
+	CREATE TABLE [dbo].[t_CSKUPeriodsOfTPR](
+		[CSKUID] [int] NOT NULL,
+		[PeriodsOfTPRID] [int] NOT NULL,
+	 CONSTRAINT [PK_t_CSKUPeriodsOfTPR] PRIMARY KEY CLUSTERED 
+	(
+		[CSKUID] ASC
+		,[PeriodsOfTPRID] ASC
 	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 	) ON [PRIMARY]
 
